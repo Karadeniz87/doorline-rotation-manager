@@ -138,6 +138,90 @@ async function runRotation() {
     }
 }
 
-window.onload = () => {
-    loadDashboard();
+window.onload = async () => {
+
+    await loadDashboard();
+
+    await loadStats();
+
+    await loadFairness();
+
+    await loadFlexibility();
 };
+async function loadStats() {
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_URL}/stats`
+            );
+
+        const stats =
+            await response.json();
+
+        console.log(
+            "Stats:",
+            stats
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Stats Fehler:",
+            error
+        );
+    }
+}
+
+async function loadFairness() {
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_URL}/fairness`
+            );
+
+        const fairness =
+            await response.json();
+
+        console.log(
+            "Fairness:",
+            fairness
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Fairness Fehler:",
+            error
+        );
+    }
+}
+
+async function loadFlexibility() {
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_URL}/flexibility`
+            );
+
+        const flexibility =
+            await response.json();
+
+        console.log(
+            "Flexibility:",
+            flexibility
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Flexibility Fehler:",
+            error
+        );
+    }
+}
