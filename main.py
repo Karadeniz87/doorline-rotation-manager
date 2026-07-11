@@ -4,15 +4,19 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from database import SessionLocal, engine, Base
-from models import EmployeeDB
+from models import EmployeeDB, RotationHistory
 from employee import Employee
 
 Base.metadata.create_all(bind=engine)
 
-# Mitarbeiter automatisch anlegen falls Datenbank leer
+# ----------------------------------------------------
+# Mitarbeiter automatisch anlegen
+# ----------------------------------------------------
+
 db_seed = SessionLocal()
 
 if db_seed.query(EmployeeDB).count() == 0:
+
     employees_seed = [
         EmployeeDB(firstname="Waldemar", lastname="Krupowicz"),
         EmployeeDB(firstname="Christian", lastname="Francke"),
@@ -38,9 +42,13 @@ if db_seed.query(EmployeeDB).count() == 0:
 
 db_seed.close()
 
+# ----------------------------------------------------
+# APP
+# ----------------------------------------------------
+
 app = FastAPI(
     title="Doorline Rotation Manager",
-    version="6.0.0"
+    version="7.0.0"
 )
 
 app.mount(
@@ -48,6 +56,10 @@ app.mount(
     StaticFiles(directory="frontend"),
     name="frontend"
 )
+
+# ----------------------------------------------------
+# Stationen
+# ----------------------------------------------------
 
 stations = [
     "30L", "30R",
@@ -68,6 +80,9 @@ double_takt_stations = {
     "70L", "70R"
 }
 
+# ----------------------------------------------------
+# Datenbank Session
+# ----------------------------------------------------
 
 def get_db():
     db = SessionLocal()
@@ -76,6 +91,9 @@ def get_db():
     finally:
         db.close()
 
+# ----------------------------------------------------
+# Home
+# ----------------------------------------------------
 
 @app.get("/")
 def home():
@@ -84,23 +102,27 @@ def home():
 
 @app.get("/health")
 def health():
-    return {"status": "running"}
+    return {
+        "status": "running"
+    }
 
-
-# ---------------- EMPLOYEES ----------------
+# ----------------------------------------------------
+# Employees
+# ----------------------------------------------------
 
 @app.get("/employees")
 def get_employees(
-    db: Session = Depends(get_db)
+        db: Session = Depends(get_db)
 ):
     return db.query(EmployeeDB).all()
 
 
 @app.get("/employees/{employee_id}")
 def get_employee(
-    employee_id: int,
-    db: Session = Depends(get_db)
+        employee_id: int,
+        db: Session = Depends(get_db)
 ):
+
     employee = db.query(EmployeeDB).filter(
         EmployeeDB.id == employee_id
     ).first()
@@ -116,9 +138,10 @@ def get_employee(
 
 @app.post("/employees")
 def add_employee(
-    employee: Employee,
-    db: Session = Depends(get_db)
+        employee: Employee,
+        db: Session = Depends(get_db)
 ):
+
     employee_db = EmployeeDB(
         **employee.model_dump()
     )
@@ -132,9 +155,9 @@ def add_employee(
 
 @app.put("/employees/{employee_id}")
 def update_employee(
-    employee_id: int,
-    employee: Employee,
-    db: Session = Depends(get_db)
+        employee_id: int,
+        employee: Employee,
+        db: Session = Depends(get_db)
 ):
 
     employee_db = db.query(EmployeeDB).filter(
@@ -158,8 +181,8 @@ def update_employee(
 
 @app.delete("/employees/{employee_id}")
 def delete_employee(
-    employee_id: int,
-    db: Session = Depends(get_db)
+        employee_id: int,
+        db: Session = Depends(get_db)
 ):
 
     employee_db = db.query(EmployeeDB).filter(
@@ -179,25 +202,28 @@ def delete_employee(
         "message": "Mitarbeiter gelöscht"
     }
 
-
-# ---------------- STATIONS ----------------
+# ----------------------------------------------------
+# Stations
+# ----------------------------------------------------
 
 @app.get("/stations")
 def get_stations():
     return [
         {
             "name": station,
-            "double_takt_allowed": station in double_takt_stations
+            "double_takt_allowed":
+                station in double_takt_stations
         }
         for station in stations
     ]
 
-
-# ---------------- ROTATION ----------------
+# ----------------------------------------------------
+# Rotation
+# ----------------------------------------------------
 
 @app.post("/rotation/run")
 def run_rotation(
-    db: Session = Depends(get_db)
+        db: Session = Depends(get_db)
 ):
 
     employees = db.query(EmployeeDB).all()
@@ -233,7 +259,11 @@ def run_rotation(
             if employee.last_station == station:
                 continue
 
-            if not getattr(employee, skill_name, False):
+            if not getattr(
+                    employee,
+                    skill_name,
+                    False
+            ):
                 continue
 
             assigned_employee = (
@@ -245,7 +275,16 @@ def run_rotation(
             employee.station = station
             employee.fairness_points += 1
 
-            assigned_employees.add(employee.id)
+            history = RotationHistory(
+                employee_name=assigned_employee,
+                station=station
+            )
+
+            db.add(history)
+
+            assigned_employees.add(
+                employee.id
+            )
 
             break
 
@@ -253,8 +292,10 @@ def run_rotation(
             "name": station,
             "employee_1": assigned_employee,
             "employee_2": None,
-            "support_required": assigned_employee is None,
-            "double_takt_allowed": station in double_takt_stations
+            "support_required":
+                assigned_employee is None,
+            "double_takt_allowed":
+                station in double_takt_stations
         })
 
     for employee in employees:
@@ -270,7 +311,8 @@ def run_rotation(
             employee.station = "Support"
 
             support_employees.append(
-                f"{employee.firstname} {employee.lastname}"
+                f"{employee.firstname} "
+                f"{employee.lastname}"
             )
 
     db.commit()
@@ -281,12 +323,13 @@ def run_rotation(
         "support_employees": support_employees
     }
 
-
-# ---------------- KPI ----------------
+# ----------------------------------------------------
+# KPI
+# ----------------------------------------------------
 
 @app.get("/stats")
 def stats(
-    db: Session = Depends(get_db)
+        db: Session = Depends(get_db)
 ):
 
     employees = db.query(EmployeeDB).all()
@@ -314,25 +357,50 @@ def stats(
         "vacation": vacation,
         "sick": sick,
         "support": support,
-        "double_takt": len(double_takt_stations)
+        "double_takt": len(
+            double_takt_stations
+        )
     }
 
+# ----------------------------------------------------
+# Fairness
+# ----------------------------------------------------
 
 @app.get("/fairness")
 def fairness(
-    db: Session = Depends(get_db)
+        db: Session = Depends(get_db)
 ):
+
     employees = db.query(EmployeeDB).all()
 
     return {
         f"{e.firstname} {e.lastname}":
-        e.fairness_points
+            e.fairness_points
         for e in employees
     }
 
+# ----------------------------------------------------
+# Historie
+# ----------------------------------------------------
+
+@app.get("/history")
+def history(
+        db: Session = Depends(get_db)
+):
+
+    return db.query(
+        RotationHistory
+    ).order_by(
+        RotationHistory.id.desc()
+    ).limit(100).all()
+
+# ----------------------------------------------------
+# Flexibility
+# ----------------------------------------------------
 
 @app.get("/flexibility")
 def flexibility():
+
     return {
         "double_takt_stations":
             list(double_takt_stations)
