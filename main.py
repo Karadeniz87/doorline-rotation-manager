@@ -5,15 +5,30 @@ from employee import Employee
 
 app = FastAPI(
     title="Doorline Rotation Manager",
-    version="1.0.0"
+    version="2.0.0"
 )
 
+# Frontend
 app.mount(
     "/frontend",
     StaticFiles(directory="frontend"),
     name="frontend"
 )
 
+# Stationen
+stations = [
+    "30L", "30R",
+    "40L", "40R",
+    "50L", "50R",
+    "60L", "60R",
+    "70L", "70R",
+    "80L", "80R",
+    "90L", "90R",
+    "100L", "100R",
+    "110L", "110R"
+]
+
+# Mitarbeiter
 employees = [
     Employee(firstname="Waldemar", lastname="Krupowicz"),
     Employee(firstname="Christian", lastname="Francke"),
@@ -31,19 +46,7 @@ employees = [
     Employee(firstname="Renata", lastname="Molek"),
     Employee(firstname="Thaer", lastname="Al Gharib"),
     Employee(firstname="Kwame", lastname="Opoku"),
-    Employee(firstname="Rawad", lastname="Al Akle"),
-]
-
-stations = [
-    "30L", "30R",
-    "40L", "40R",
-    "50L", "50R",
-    "60L", "60R",
-    "70L", "70R",
-    "80L", "80R",
-    "90L", "90R",
-    "100L", "100R",
-    "110L", "110R"
+    Employee(firstname="Rawad", lastname="Al Akle")
 ]
 
 
@@ -54,10 +57,10 @@ def home():
 
 @app.get("/health")
 def health():
-    return {
-        "status": "running"
-    }
+    return {"status": "running"}
 
+
+# ---------------- EMPLOYEES ----------------
 
 @app.get("/employees")
 def get_employees():
@@ -78,13 +81,8 @@ def get_employee(employee_id: int):
 
 @app.post("/employees")
 def add_employee(employee: Employee):
-
     employees.append(employee)
-
-    return {
-        "message": "Mitarbeiter hinzugefügt",
-        "employee": employee
-    }
+    return employee
 
 
 @app.put("/employees/{employee_id}")
@@ -100,7 +98,6 @@ def update_employee(
         )
 
     employees[employee_id] = employee
-
     return employee
 
 
@@ -113,23 +110,22 @@ def delete_employee(employee_id: int):
             detail="Mitarbeiter nicht gefunden"
         )
 
-    deleted = employees.pop(employee_id)
+    return employees.pop(employee_id)
 
-    return {
-        "message": "Mitarbeiter gelöscht",
-        "employee": deleted
-    }
 
+# ---------------- STATIONS ----------------
 
 @app.get("/stations")
 def get_stations():
     return stations
 
 
+# ---------------- ROTATION ----------------
+
 @app.post("/rotation/run")
 def run_rotation():
 
-    result = []
+    rotation_result = []
     assigned_employees = set()
     support_employees = []
 
@@ -140,15 +136,19 @@ def run_rotation():
 
         for employee in employees:
 
+            # Krank
             if employee.is_sick:
                 continue
 
+            # Urlaub
             if employee.is_vacation:
                 continue
 
+            # Nicht doppelt einsetzen
             if employee.lastname in assigned_employees:
                 continue
 
+            # Skill vorhanden?
             if getattr(employee, skill_name, False):
 
                 assigned_employee = (
@@ -165,16 +165,16 @@ def run_rotation():
 
                 break
 
-        result.append({
+        rotation_result.append({
             "name": station,
             "employee_1": assigned_employee,
             "employee_2": None,
-            "double_takt_allowed":
-                station.startswith(
-                    ("40", "50", "60", "70")
-                )
+            "double_takt_allowed": station.startswith(
+                ("40", "50", "60", "70")
+            )
         })
 
+    # Support Mitarbeiter
     for employee in employees:
 
         if employee.is_sick:
@@ -183,22 +183,20 @@ def run_rotation():
         if employee.is_vacation:
             continue
 
-        fullname = (
-            f"{employee.firstname} "
-            f"{employee.lastname}"
-        )
-
         if employee.lastname not in assigned_employees:
             support_employees.append(
-                fullname
+                f"{employee.firstname} "
+                f"{employee.lastname}"
             )
 
     return {
         "message": "Rotation durchgeführt",
-        "stations": result,
+        "stations": rotation_result,
         "support_employees": support_employees
     }
 
+
+# ---------------- KPI ----------------
 
 @app.get("/stats")
 def stats():
@@ -220,7 +218,7 @@ def stats():
         "available": available,
         "vacation": vacation,
         "sick": sick,
-        "support": 0,
+        "support": available,
         "double_takt": 0
     }
 
