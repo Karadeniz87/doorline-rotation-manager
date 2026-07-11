@@ -129,6 +129,55 @@ def get_stations():
 
 @app.post("/rotation/run")
 def run_rotation():
+
+    result = []
+    assigned_employees = set()
+
+    for station in stations:
+
+        assigned_employee = None
+
+        skill_name = f"skill_{station}"
+
+        for employee in employees:
+
+            # Nur verfügbare Mitarbeiter
+            if employee.status != "Verfügbar":
+                continue
+
+            # Mitarbeiter nicht doppelt einsetzen
+            if employee.lastname in assigned_employees:
+                continue
+
+            # Prüfen ob Mitarbeiter die Station beherrscht
+            if getattr(employee, skill_name, False):
+
+                assigned_employee = (
+                    f"{employee.firstname} "
+                    f"{employee.lastname}"
+                )
+
+                assigned_employees.add(
+                    employee.lastname
+                )
+
+                break
+
+        result.append({
+            "name": station,
+            "active": True,
+            "employee_1": assigned_employee,
+            "employee_2": None,
+            "support_required": False,
+            "double_takt_allowed": station.startswith(
+                ("40", "50", "60", "70")
+            )
+        })
+
+    return {
+        "message": "Rotation durchgeführt",
+        "stations": result
+    }
     result = []
 
     employee_index = 0
