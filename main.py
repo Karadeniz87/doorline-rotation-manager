@@ -5,10 +5,10 @@ from employee import Employee
 
 app = FastAPI(
     title="Doorline Rotation Manager",
-    version="2.0.0"
+    version="3.0.0"
 )
 
-# Frontend bereitstellen
+# Frontend
 app.mount(
     "/frontend",
     StaticFiles(directory="frontend"),
@@ -57,7 +57,9 @@ def home():
 
 @app.get("/health")
 def health():
-    return {"status": "running"}
+    return {
+        "status": "running"
+    }
 
 
 # ---------------- EMPLOYEES ----------------
@@ -86,10 +88,7 @@ def add_employee(employee: Employee):
 
 
 @app.put("/employees/{employee_id}")
-def update_employee(
-    employee_id: int,
-    employee: Employee
-):
+def update_employee(employee_id: int, employee: Employee):
 
     if employee_id < 0 or employee_id >= len(employees):
         raise HTTPException(
@@ -110,12 +109,7 @@ def delete_employee(employee_id: int):
             detail="Mitarbeiter nicht gefunden"
         )
 
-    deleted = employees.pop(employee_id)
-
-    return {
-        "message": "Mitarbeiter gelöscht",
-        "employee": deleted
-    }
+    return employees.pop(employee_id)
 
 
 # ---------------- STATIONS ----------------
@@ -143,7 +137,7 @@ def run_rotation():
     assigned_employees = set()
     support_employees = []
 
-    # Wenigste Fairness Punkte zuerst
+    # Wenigste Fairness zuerst
     sorted_employees = sorted(
         employees,
         key=lambda x: x.fairness_points
@@ -168,7 +162,11 @@ def run_rotation():
             if employee.lastname in assigned_employees:
                 continue
 
-            # Skill vorhanden?
+            # Nicht direkt wieder gleiche Station
+            if employee.last_station == station:
+                continue
+
+            # Skill vorhanden
             if not getattr(employee, skill_name, False):
                 continue
 
@@ -177,6 +175,7 @@ def run_rotation():
                 f"{employee.lastname}"
             )
 
+            employee.last_station = employee.station
             employee.station = station
             employee.fairness_points += 1
 
@@ -197,7 +196,7 @@ def run_rotation():
         })
 
     # Support Mitarbeiter
-    for employee in sorted_employees:
+    for employee in employees:
 
         if employee.is_sick:
             continue
@@ -216,9 +215,8 @@ def run_rotation():
 
     return {
         "message": "Rotation durchgeführt",
-        "assigned_employees": len(assigned_employees),
-        "support_employees": support_employees,
-        "stations": rotation_result
+        "stations": rotation_result,
+        "support_employees": support_employees
     }
 
 
@@ -237,12 +235,12 @@ def stats():
         if e.is_vacation
     )
 
-    available = len(employees) - sick - vacation
-
-    support = len([
-        e for e in employees
+    support = sum(
+        1 for e in employees
         if e.station == "Support"
-    ])
+    )
+
+    available = len(employees) - sick - vacation
 
     return {
         "employees_total": len(employees),
