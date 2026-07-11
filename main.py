@@ -143,7 +143,7 @@ def add_employee(
 ):
 
     employee_db = EmployeeDB(
-        **employee.model_dump()
+        **employee.dict()
     )
 
     db.add(employee_db)
@@ -170,7 +170,7 @@ def update_employee(
             detail="Mitarbeiter nicht gefunden"
         )
 
-    for key, value in employee.model_dump().items():
+    for key, value in model_dump().items():
         setattr(employee_db, key, value)
 
     db.commit()
