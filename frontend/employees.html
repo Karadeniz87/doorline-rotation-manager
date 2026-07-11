@@ -2,68 +2,30 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiterverwaltung</title>
 
-    <title>Mitarbeiter</title>
-
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/frontend/style.css">
 </head>
 
 <body>
 
 <div class="container">
 
-    <header>
-        <h1>👥 Mitarbeiter</h1>
-        <p>Doorline Rotation Manager</p>
+    <header class="header">
+        <h1>👥 Mitarbeiterverwaltung</h1>
+        <p>Krank und Urlaub verwalten</p>
     </header>
 
-    <div class="section">
+    <div id="employees_container"></div>
 
-        <input
-            type="text"
-            id="firstname"
-            placeholder="Vorname">
-
-        <br><br>
-
-        <input
-            type="text"
-            id="lastname"
-            placeholder="Nachname">
-
-        <br><br>
-
-        <select id="status">
-            <option>Verfügbar</option>
-            <option>Urlaub</option>
-            <option>Krank</option>
-            <option>Support</option>
-            <option>Training</option>
-        </select>
-
-        <br><br>
-
-        <button onclick="addEmployee()">
-            ➕ Mitarbeiter hinzufügen
-        </button>
-
-    </div>
-
-    <div id="employee_list">
-
-    </div>
-
-    <br>
-
-    <button onclick="window.location.href='index.html'">
-        ← Dashboard
+    <button onclick="window.location.href='/'">
+        ← Zurück zum Dashboard
     </button>
 
 </div>
 
-<script src="employees.js"></script>
+<script src="/frontend/employees.js"></script>
 
 </body>
 </html>
