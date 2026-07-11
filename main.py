@@ -48,7 +48,7 @@ db_seed.close()
 
 app = FastAPI(
     title="Doorline Rotation Manager",
-    version="7.0.0"
+    version="7.0.1"
 )
 
 app.mount(
