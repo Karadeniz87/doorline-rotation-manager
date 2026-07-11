@@ -1,17 +1,48 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from employee import Employee
-from rotation_engine import run_rotation
 
 app = FastAPI(
     title="Doorline Rotation Manager",
-    version="2.0.0"
+    version="1.0.0"
 )
 
-employees = []
+# --------------------------------------------------
+# FRONTEND
+# --------------------------------------------------
 
-stations = []
+app.mount(
+    "/frontend",
+    StaticFiles(directory="frontend"),
+    name="frontend"
+)
 
-station_names = [
+# --------------------------------------------------
+# MITARBEITER
+# --------------------------------------------------
+
+employees = [
+    Employee(firstname="Waldemar", lastname="Krupowicz"),
+    Employee(firstname="Christian", lastname="Francke"),
+    Employee(firstname="Cagliyan", lastname="Aslandag"),
+    Employee(firstname="Mhd Nour", lastname="Fallah"),
+    Employee(firstname="Oliwia", lastname="Budkowska"),
+    Employee(firstname="Maxwell Kofi", lastname="Mensah"),
+    Employee(firstname="Adolphe", lastname="Boumsong Dimouk"),
+    Employee(firstname="Fabian", lastname="Dubaj"),
+    Employee(firstname="Salh", lastname="Alamash"),
+    Employee(firstname="Sarah Akuma", lastname="Ukpo"),
+    Employee(firstname="Germay", lastname="Mehari"),
+    Employee(firstname="Karolina", lastname="Włodarczyk"),
+    Employee(firstname="Md Jowel", lastname="Hossain"),
+    Employee(firstname="Renata", lastname="Molek"),
+    Employee(firstname="Thaer", lastname="Al Gharib"),
+    Employee(firstname="Kwame", lastname="Opoku"),
+    Employee(firstname="Rawad", lastname="Al Akle")
+]
+
+stations = [
     "30L","30R",
     "40L","40R",
     "50L","50R",
@@ -23,64 +54,34 @@ station_names = [
     "110L","110R"
 ]
 
-for station in station_names:
-    stations.append({
-        "name": station,
-        "active": True,
-        "double_takt_allowed": station in [
-            "40L","40R",
-            "50L","50R",
-            "60L","60R",
-            "70L","70R"
-        ],
-        "double_takt_active": False,
-        "employee_1": None,
-        "employee_2": None,
-        "support_required": False
-    })
-
-default_employees = [
-    ("Waldemar","Krupowicz"),
-    ("Christian","Francke"),
-    ("Cagliyan","Aslandag"),
-    ("Mhd Nour","Fallah"),
-    ("Oliwia","Budkowska"),
-    ("Maxwell Kofi","Mensah"),
-    ("Adolphe Boumsong","Dimouk"),
-    ("Fabian","Dubaj"),
-    ("Salh","Alamash"),
-    ("Sarah Akuma","Ukpo"),
-    ("Germay","Mehari"),
-    ("Karolina","Włodarczyk"),
-    ("Md Jowel","Hossain"),
-    ("Renata","Molek"),
-    ("Thaer","Al Gharib"),
-    ("Kwame","Opoku"),
-    ("Rawad","Al Akle")
-]
-
-for first, last in default_employees:
-    employees.append({
-        "firstname": first,
-        "lastname": last,
-        "status": "Verfügbar",
-        "fairness_points": 0
-    })
+# --------------------------------------------------
+# HOME
+# --------------------------------------------------
 
 @app.get("/")
 def home():
+    return FileResponse("frontend/index.html")
+
+
+@app.get("/health")
+def health():
     return {
-        "app": "Doorline Rotation Manager",
-        "employees": len(employees),
-        "stations": len(stations)
+        "status": "running"
     }
+
+
+# --------------------------------------------------
+# EMPLOYEES
+# --------------------------------------------------
 
 @app.get("/employees")
 def get_employees():
     return employees
 
+
 @app.get("/employees/{employee_id}")
 def get_employee(employee_id: int):
+
     if employee_id >= len(employees):
         raise HTTPException(
             status_code=404,
@@ -88,91 +89,151 @@ def get_employee(employee_id: int):
         )
 
     return employees[employee_id]
+
 
 @app.post("/employees")
 def add_employee(employee: Employee):
-    employees.append(employee.model_dump())
-    return employee
+
+    employees.append(employee)
+
+    return {
+        "message": "Mitarbeiter hinzugefügt",
+        "employee": employee
+    }
+
 
 @app.put("/employees/{employee_id}")
 def update_employee(
-    employee_id: int,
-    employee: Employee
+        employee_id: int,
+        employee: Employee
 ):
+
     if employee_id >= len(employees):
         raise HTTPException(
             status_code=404,
             detail="Mitarbeiter nicht gefunden"
         )
 
-    employees[employee_id] = employee.model_dump()
+    employees[employee_id] = employee
 
     return employees[employee_id]
 
+
 @app.delete("/employees/{employee_id}")
 def delete_employee(employee_id: int):
+
     if employee_id >= len(employees):
         raise HTTPException(
             status_code=404,
             detail="Mitarbeiter nicht gefunden"
         )
 
-    return employees.pop(employee_id)
+    deleted = employees.pop(employee_id)
+
+    return {
+        "message": "Mitarbeiter gelöscht",
+        "employee": deleted
+    }
+
+
+# --------------------------------------------------
+# STATIONS
+# --------------------------------------------------
 
 @app.get("/stations")
 def get_stations():
-    return stations
+
+    result = []
+
+    for station in stations:
+        result.append({
+            "name": station,
+            "active": True,
+            "employee_1": None,
+            "employee_2": None,
+            "double_takt_allowed":
+                station.startswith("40")
+                or station.startswith("50")
+                or station.startswith("60")
+                or station.startswith("70")
+        })
+
+    return result
+
+
+# --------------------------------------------------
+# ROTATION
+# --------------------------------------------------
 
 @app.post("/rotation/run")
-def rotation():
-    return run_rotation(
-        employees,
-        stations
-    )
+def run_rotation():
+
+    result = []
+
+    employee_index = 0
+
+    for station in stations:
+
+        assigned_employee = None
+
+        if employee_index < len(employees):
+            assigned_employee = (
+                employees[employee_index].firstname
+                + " "
+                + employees[employee_index].lastname
+            )
+
+            employee_index += 1
+
+        result.append({
+            "name": station,
+            "active": True,
+            "employee_1": assigned_employee,
+            "employee_2": None,
+            "support_required": False
+        })
+
+    return {
+        "message": "Rotation durchgeführt",
+        "stations": result
+    }
+
+
+# --------------------------------------------------
+# KPI
+# --------------------------------------------------
 
 @app.get("/stats")
 def stats():
+
     return {
-        "employees": len(employees),
-        "stations": len(stations),
-        "available": len([
-            e for e in employees
-            if e["status"] == "Verfügbar"
-        ])
+        "employees_total": len(employees),
+        "available": len(employees),
+        "vacation": 0,
+        "sick": 0,
+        "support": 0,
+        "double_takt": 0
     }
+
 
 @app.get("/fairness")
 def fairness():
-    return sorted(
-        employees,
-        key=lambda x: x.get(
-            "fairness_points",
-            0
-        )
-    )
+
+    return {
+        employee.firstname + " " + employee.lastname:
+            employee.fairness_points
+        for employee in employees
+    }
+
 
 @app.get("/flexibility")
 def flexibility():
 
-    result = []
-
-    for employee in employees:
-
-        skills = len([
-            key for key, value in employee.items()
-            if key.startswith("skill_") and value
-        ])
-
-        result.append({
-            "employee":
-                f"{employee['firstname']} "
-                f"{employee['lastname']}",
-            "skills": skills
-        })
-
-    result.sort(
-        key=lambda x: x["skills"],
-        reverse=True
-    )
-
-    return result
+    return {
+        "double_takt_stations": [
+            "40L","40R",
+            "50L","50R",
+            "60L","60R",
+            "70L","70R"
+        ]
+    }
