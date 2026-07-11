@@ -1,32 +1,41 @@
 def run_rotation(employees, stations):
 
-    available_employees = [
-        e for e in employees
-        if e.get("status") == "Verfügbar"
+    available = [
+        employee for employee in employees
+        if employee["status"] == "Verfügbar"
     ]
 
-    employee_index = 0
+    assigned = []
 
     for station in stations:
 
-        if not station["active"]:
-            continue
+        station_name = station["name"]
 
         station["employee_1"] = None
         station["employee_2"] = None
 
-        if employee_index < len(available_employees):
-            employee = available_employees[employee_index]
+        for employee in available:
 
-            station["employee_1"] = (
-                employee["firstname"] +
-                " " +
-                employee["lastname"]
-            )
+            skill_name = f"skill_{station_name}"
 
-            employee_index += 1
+            if (
+                employee.get(skill_name, False)
+                and employee["lastname"] not in assigned
+            ):
+
+                station["employee_1"] = (
+                    employee["firstname"]
+                    + " "
+                    + employee["lastname"]
+                )
+
+                assigned.append(
+                    employee["lastname"]
+                )
+
+                break
 
     return {
-        "assigned_employees": employee_index,
+        "assigned": len(assigned),
         "stations": stations
     }
