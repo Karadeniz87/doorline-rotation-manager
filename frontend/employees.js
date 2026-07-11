@@ -1,5 +1,6 @@
 const API =
-"https://doorline-rotation-manager.onrender.com";
+    "https://doorline-rotation-manager.onrender.com";
+
 
 async function loadEmployees() {
 
@@ -9,51 +10,85 @@ async function loadEmployees() {
     const employees =
         await response.json();
 
-    const list =
-        document.getElementById("employeeList");
+    const container =
+        document.getElementById(
+            "employee_list"
+        );
 
-    list.innerHTML = "";
+    container.innerHTML = "";
 
     employees.forEach((employee, index) => {
 
-        list.innerHTML += `
+        container.innerHTML += `
             <div class="card">
-                <h3>${employee.firstname} ${employee.lastname}</h3>
-                <p>${employee.status}</p>
 
-                <button onclick="deleteEmployee(${index})">
-                    Löschen
+                <h3>
+                    ${employee.firstname}
+                    ${employee.lastname}
+                </h3>
+
+                <p>
+                    Status:
+                    ${employee.status}
+                </p>
+
+                <p>
+                    Fairness:
+                    ${employee.fairness_points || 0}
+                </p>
+
+                <button
+                    onclick="deleteEmployee(${index})">
+
+                    🗑 Löschen
+
                 </button>
+
             </div>
         `;
     });
 }
 
+
 async function addEmployee() {
 
     const firstname =
-        document.getElementById("firstname").value;
+        document.getElementById(
+            "firstname"
+        ).value;
 
     const lastname =
-        document.getElementById("lastname").value;
+        document.getElementById(
+            "lastname"
+        ).value;
 
     const status =
-        document.getElementById("status").value;
+        document.getElementById(
+            "status"
+        ).value;
 
-    await fetch(`${API}/employees`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            firstname,
-            lastname,
-            status
-        })
-    });
+    await fetch(
+        `${API}/employees`,
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type":
+                    "application/json"
+            },
+
+            body: JSON.stringify({
+                firstname,
+                lastname,
+                status,
+                fairness_points: 0
+            })
+        }
+    );
 
     loadEmployees();
 }
+
 
 async function deleteEmployee(id) {
 
