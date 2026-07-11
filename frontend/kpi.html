@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>KPI Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>📊 KPI Dashboard</h1>
+        <p>Schichtübersicht</p>
+    </header>
+
+    <div class="cards">
+
+        <div class="card green">
+            <h3>Verfügbar</h3>
+            <p id="available">0</p>
+        </div>
+
+        <div class="card yellow">
+            <h3>Urlaub</h3>
+            <p id="vacation">0</p>
+        </div>
+
+        <div class="card red">
+            <h3>Krank</h3>
+            <p id="sick">0</p>
+        </div>
+
+        <div class="card orange">
+            <h3>Support</h3>
+            <p id="support">0</p>
+        </div>
+
+        <div class="card blue">
+            <h3>Doppeltakt</h3>
+            <p id="double_takt">0</p>
+        </div>
+
+    </div>
+
+    <div class="section">
+        <h2>🏆 Fairness Ranking</h2>
+        <div id="fairness_ranking"></div>
+    </div>
+
+    <div class="section">
+        <h2>🔧 Flexibilitätsranking</h2>
+        <div id="flexibility_ranking"></div>
+    </div>
+
+    <button onclick="window.location.href='index.html'">
+        ← Dashboard
+    </button>
+
+</div>
+
+<script src="kpi.js"></script>
+
+</body>
+</html>
