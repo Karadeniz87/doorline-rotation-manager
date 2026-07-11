@@ -66,7 +66,9 @@ async function loadSkills() {
             `;
         });
 
-        html += "</div>";
+        html += `
+            </div>
+        `;
 
         container.innerHTML += html;
     });
