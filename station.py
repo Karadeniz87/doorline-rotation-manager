@@ -1,15 +1,11 @@
-from pydantic import BaseModel
-from typing import Optional
-
-
-class Station(BaseModel):
-    name: str
-
-    active: bool = True
-
-    double_takt: bool = False
-
-    assigned_employee_left: Optional[str] = None
-    assigned_employee_right: Optional[str] = None
-
-    support_required: bool = False
+stations = [
+    "30L","30R",
+    "40L","40R",
+    "50L","50R",
+    "60L","60R",
+    "70L","70R",
+    "80L","80R",
+    "90L","90R",
+    "100L","100R",
+    "110L","110R"
+]
