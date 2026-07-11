@@ -1,7 +1,7 @@
 const API_URL =
     "https://doorline-rotation-manager.onrender.com";
 
-const stations = [
+const STATIONS = [
     "30L","30R",
     "40L","40R",
     "50L","50R",
@@ -15,63 +15,78 @@ const stations = [
 
 async function loadSkills() {
 
-    const response =
-        await fetch(
-            `${API_URL}/employees`
-        );
+    try {
 
-    const employees =
-        await response.json();
+        const response =
+            await fetch(
+                `${API_URL}/employees`
+            );
 
-    const container =
-        document.getElementById(
-            "skills_container"
-        );
+        const employees =
+            await response.json();
 
-    container.innerHTML = "";
+        const container =
+            document.getElementById(
+                "skills_container"
+            );
 
-    employees.forEach((employee, index) => {
+        container.innerHTML = "";
 
-        let html = `
-            <div class="card">
-                <h3>
-                    ${employee.firstname}
-                    ${employee.lastname}
-                </h3>
-        `;
+        employees.forEach(
+            (employee, index) => {
 
-        stations.forEach(station => {
+            let html = `
+                <div class="card">
+                    <h2>
+                        ${employee.firstname}
+                        ${employee.lastname}
+                    </h2>
 
-            const checked =
-                employee[`skill_${station}`]
-                    ? "checked"
-                    : "";
+                    <div class="skills-grid">
+            `;
+
+            STATIONS.forEach(
+                station => {
+
+                const checked =
+                    employee[
+                        `skill_${station}`
+                    ]
+                        ? "checked"
+                        : "";
+
+                html += `
+                    <label class="skill-item">
+                        <input
+                            type="checkbox"
+                            ${checked}
+                            onchange="
+                                updateSkill(
+                                    ${index},
+                                    '${station}',
+                                    this.checked
+                                )
+                            "
+                        >
+                        ${station}
+                    </label>
+                `;
+            });
 
             html += `
-                <label>
-                    <input
-                        type="checkbox"
-                        ${checked}
-                        onchange="
-                            updateSkill(
-                                ${index},
-                                '${station}',
-                                this.checked
-                            )
-                        "
-                    >
-                    ${station}
-                </label>
-                <br>
+                    </div>
+                </div>
             `;
+
+            container.innerHTML += html;
         });
 
-        html += `
-            </div>
-        `;
+    } catch(error) {
 
-        container.innerHTML += html;
-    });
+        console.error(
+            error
+        );
+    }
 }
 
 async function updateSkill(
@@ -80,29 +95,49 @@ async function updateSkill(
     value
 ) {
 
-    const response =
-        await fetch(
-            `${API_URL}/employees/${employeeId}`
-        );
+    try {
 
-    const employee =
-        await response.json();
+        const response =
+            await fetch(
+                `${API_URL}/employees/${employeeId}`
+            );
 
-    employee[`skill_${station}`] = value;
+        const employee =
+            await response.json();
 
-    await fetch(
-        `${API_URL}/employees/${employeeId}`,
-        {
-            method: "PUT",
-            headers: {
-                "Content-Type":
-                    "application/json"
-            },
-            body: JSON.stringify(
-                employee
-            )
+        employee[
+            `skill_${station}`
+        ] = value;
+
+        const saveResponse =
+            await fetch(
+                `${API_URL}/employees/${employeeId}`,
+                {
+                    method:"PUT",
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body:JSON.stringify(
+                        employee
+                    )
+                }
+            );
+
+        if(
+            saveResponse.ok
+        ){
+            console.log(
+                "Skill gespeichert"
+            );
         }
-    );
+
+    } catch(error){
+
+        console.error(
+            error
+        );
+    }
 }
 
 loadSkills();
