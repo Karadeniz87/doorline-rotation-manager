@@ -1,56 +1,52 @@
-const API_URL = "https://doorline-rotation-manager.onrender.com";
+async function loadStats() {
 
-window.onload = async () => {
-    await loadEmployees();
-    await loadStations();
-};
+    const response = await fetch("/stats");
+    const stats = await response.json();
 
-async function loadEmployees() {
-    try {
-        const response = await fetch(`${API_URL}/employees`);
-        const employees = await response.json();
+    document.getElementById(
+        "employees_total"
+    ).innerText =
+        stats.employees_total;
 
-        document.getElementById("employees_total").innerText = employees.length;
+    document.getElementById(
+        "available"
+    ).innerText =
+        stats.available;
 
-        const available = employees.filter(
-            e => e.status === "Verfügbar"
-        ).length;
+    document.getElementById(
+        "vacation"
+    ).innerText =
+        stats.vacation;
 
-        const vacation = employees.filter(
-            e => e.status === "Urlaub"
-        ).length;
+    document.getElementById(
+        "sick"
+    ).innerText =
+        stats.sick;
 
-        const sick = employees.filter(
-            e => e.status === "Krank"
-        ).length;
+    document.getElementById(
+        "support"
+    ).innerText =
+        stats.support;
 
-        const support = employees.filter(
-            e => e.status === "Support"
-        ).length;
-
-        document.getElementById("available").innerText = available;
-        document.getElementById("vacation").innerText = vacation;
-        document.getElementById("sick").innerText = sick;
-        document.getElementById("support").innerText = support;
-
-    } catch (error) {
-        console.error("Fehler beim Laden der Mitarbeiter:", error);
-    }
+    document.getElementById(
+        "double_takt"
+    ).innerText =
+        stats.double_takt;
 }
 
-async function loadStations() {
-    try {
-        const response = await fetch(`${API_URL}/stations`);
-        const stations = await response.json();
 
-        renderStations(stations);
+async function runRotation() {
 
-    } catch (error) {
-        console.error("Fehler beim Laden der Stationen:", error);
-    }
-}
+    const response =
+        await fetch(
+            "/rotation/run",
+            {
+                method: "POST"
+            }
+        );
 
-function renderStations(stations) {
+    const data =
+        await response.json();
 
     const container =
         document.getElementById(
@@ -59,74 +55,58 @@ function renderStations(stations) {
 
     container.innerHTML = "";
 
-    let doubleTaktCounter = 0;
-
-    stations.forEach(station => {
-
-        if (
-            station.double_takt_active
-        ) {
-            doubleTaktCounter++;
-        }
-
-        const employee =
-            station.employee_1 ||
-            station.assigned_employee ||
-            "Nicht besetzt";
+    data.stations.forEach(
+        station => {
 
         container.innerHTML += `
             <div class="station">
-                <h3>${station.name}</h3>
-                <p>${employee}</p>
+
+                <h3>
+                    ${station.name}
+                </h3>
+
+                <p>
+                    ${
+                        station.employee_1
+                        || "Nicht besetzt"
+                    }
+                </p>
+
+                ${
+                    station.employee_2
+                    ? `
+                    <p>
+                        ${station.employee_2}
+                    </p>
+                    `
+                    : ""
+                }
+
+                ${
+                    station.double_takt_allowed
+                    ? `
+                    <small>
+                        Doppeltakt möglich
+                    </small>
+                    `
+                    : ""
+                }
+
             </div>
         `;
     });
 
     document.getElementById(
-        "double_takt"
-    ).innerText = doubleTaktCounter;
-}
-
-async function runRotation() {
-
-    try {
-
-        const response =
-            await fetch(
-                `${API_URL}/rotation/run`,
-                {
-                    method: "POST"
-                }
-            );
-
-        const result =
-            await response.json();
-
-        document.getElementById(
-            "rotation_result"
-        ).innerText =
-            JSON.stringify(
-                result,
-                null,
-                2
-            );
-
-        if (result.stations) {
-            renderStations(
-                result.stations
-            );
-        }
-
-    } catch (error) {
-
-        console.error(
-            "Rotation Fehler:",
-            error
+        "rotation_result"
+    ).innerText =
+        JSON.stringify(
+            data.support_employees,
+            null,
+            2
         );
 
-        document.getElementById(
-            "rotation_result"
-        ).innerText =
-            "Fehler beim Starten der Rotation";
-    }
+    loadStats();
 }
+
+
+loadStats();
