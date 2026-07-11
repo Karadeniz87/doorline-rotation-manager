@@ -1,4 +1,5 @@
-const API = "https://doorline-rotation-manager.onrender.com";
+const API_URL =
+    "https://doorline-rotation-manager.onrender.com";
 
 const stations = [
     "30L","30R",
@@ -14,22 +15,29 @@ const stations = [
 
 async function loadSkills() {
 
-    const response = await fetch(`${API}/employees`);
-    const employees = await response.json();
+    const response =
+        await fetch(
+            `${API_URL}/employees`
+        );
+
+    const employees =
+        await response.json();
 
     const container =
-        document.getElementById("employeeSkills");
+        document.getElementById(
+            "skills_container"
+        );
 
     container.innerHTML = "";
 
     employees.forEach((employee, index) => {
 
         let html = `
-        <div class="section">
-            <h3>
-                ${employee.firstname}
-                ${employee.lastname}
-            </h3>
+            <div class="card">
+                <h3>
+                    ${employee.firstname}
+                    ${employee.lastname}
+                </h3>
         `;
 
         stations.forEach(station => {
@@ -58,7 +66,7 @@ async function loadSkills() {
             `;
         });
 
-        html += `</div>`;
+        html += "</div>";
 
         container.innerHTML += html;
     });
@@ -72,7 +80,7 @@ async function updateSkill(
 
     const response =
         await fetch(
-            `${API}/employees/${employeeId}`
+            `${API_URL}/employees/${employeeId}`
         );
 
     const employee =
@@ -81,14 +89,16 @@ async function updateSkill(
     employee[`skill_${station}`] = value;
 
     await fetch(
-        `${API}/employees/${employeeId}`,
+        `${API_URL}/employees/${employeeId}`,
         {
             method: "PUT",
             headers: {
                 "Content-Type":
                     "application/json"
             },
-            body: JSON.stringify(employee)
+            body: JSON.stringify(
+                employee
+            )
         }
     );
 }
