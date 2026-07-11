@@ -8,7 +8,7 @@ app = FastAPI(
     version="2.0.0"
 )
 
-# Frontend
+# Frontend bereitstellen
 app.mount(
     "/frontend",
     StaticFiles(directory="frontend"),
@@ -70,7 +70,7 @@ def get_employees():
 @app.get("/employees/{employee_id}")
 def get_employee(employee_id: int):
 
-    if employee_id >= len(employees):
+    if employee_id < 0 or employee_id >= len(employees):
         raise HTTPException(
             status_code=404,
             detail="Mitarbeiter nicht gefunden"
@@ -91,7 +91,7 @@ def update_employee(
     employee: Employee
 ):
 
-    if employee_id >= len(employees):
+    if employee_id < 0 or employee_id >= len(employees):
         raise HTTPException(
             status_code=404,
             detail="Mitarbeiter nicht gefunden"
@@ -104,20 +104,34 @@ def update_employee(
 @app.delete("/employees/{employee_id}")
 def delete_employee(employee_id: int):
 
-    if employee_id >= len(employees):
+    if employee_id < 0 or employee_id >= len(employees):
         raise HTTPException(
             status_code=404,
             detail="Mitarbeiter nicht gefunden"
         )
 
-    return employees.pop(employee_id)
+    deleted = employees.pop(employee_id)
+
+    return {
+        "message": "Mitarbeiter gelöscht",
+        "employee": deleted
+    }
 
 
 # ---------------- STATIONS ----------------
 
 @app.get("/stations")
 def get_stations():
-    return stations
+
+    return [
+        {
+            "name": station,
+            "double_takt_allowed": station.startswith(
+                ("40", "50", "60", "70")
+            )
+        }
+        for station in stations
+    ]
 
 
 # ---------------- ROTATION ----------------
@@ -129,12 +143,18 @@ def run_rotation():
     assigned_employees = set()
     support_employees = []
 
+    # Wenigste Fairness Punkte zuerst
+    sorted_employees = sorted(
+        employees,
+        key=lambda x: x.fairness_points
+    )
+
     for station in stations:
 
         assigned_employee = None
         skill_name = f"skill_{station}"
 
-        for employee in employees:
+        for employee in sorted_employees:
 
             # Krank
             if employee.is_sick:
@@ -144,38 +164,40 @@ def run_rotation():
             if employee.is_vacation:
                 continue
 
-            # Nicht doppelt einsetzen
+            # Bereits eingeplant
             if employee.lastname in assigned_employees:
                 continue
 
             # Skill vorhanden?
-            if getattr(employee, skill_name, False):
+            if not getattr(employee, skill_name, False):
+                continue
 
-                assigned_employee = (
-                    f"{employee.firstname} "
-                    f"{employee.lastname}"
-                )
+            assigned_employee = (
+                f"{employee.firstname} "
+                f"{employee.lastname}"
+            )
 
-                employee.station = station
-                employee.fairness_points += 1
+            employee.station = station
+            employee.fairness_points += 1
 
-                assigned_employees.add(
-                    employee.lastname
-                )
+            assigned_employees.add(
+                employee.lastname
+            )
 
-                break
+            break
 
         rotation_result.append({
             "name": station,
             "employee_1": assigned_employee,
             "employee_2": None,
+            "support_required": assigned_employee is None,
             "double_takt_allowed": station.startswith(
                 ("40", "50", "60", "70")
             )
         })
 
     # Support Mitarbeiter
-    for employee in employees:
+    for employee in sorted_employees:
 
         if employee.is_sick:
             continue
@@ -184,6 +206,9 @@ def run_rotation():
             continue
 
         if employee.lastname not in assigned_employees:
+
+            employee.station = "Support"
+
             support_employees.append(
                 f"{employee.firstname} "
                 f"{employee.lastname}"
@@ -191,8 +216,9 @@ def run_rotation():
 
     return {
         "message": "Rotation durchgeführt",
-        "stations": rotation_result,
-        "support_employees": support_employees
+        "assigned_employees": len(assigned_employees),
+        "support_employees": support_employees,
+        "stations": rotation_result
     }
 
 
@@ -213,12 +239,17 @@ def stats():
 
     available = len(employees) - sick - vacation
 
+    support = len([
+        e for e in employees
+        if e.station == "Support"
+    ])
+
     return {
         "employees_total": len(employees),
         "available": available,
         "vacation": vacation,
         "sick": sick,
-        "support": available,
+        "support": support,
         "double_takt": 0
     }
 
@@ -228,7 +259,7 @@ def fairness():
 
     return {
         f"{e.firstname} {e.lastname}":
-            e.fairness_points
+        e.fairness_points
         for e in employees
     }
 
