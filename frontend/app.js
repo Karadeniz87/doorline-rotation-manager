@@ -1,57 +1,54 @@
-const API_URL =
-    "https://doorline-rotation-manager.onrender.com";
+const API_URL = "https://doorline-rotation-manager.onrender.com";
 
-
-async function loadStats() {
-
-    try {
-
-        const response =
-            await fetch(`${API_URL}/stats`);
-
-        const data =
-            await response.json();
-
-        document.getElementById(
-            "employees_total"
-        ).innerText =
-            data.employees_total || 0;
-
-        document.getElementById(
-            "available"
-        ).innerText =
-            data.available || 0;
-
-        document.getElementById(
-            "vacation"
-        ).innerText =
-            data.urlaub || 0;
-
-        document.getElementById(
-            "sick"
-        ).innerText =
-            data.krank || 0;
-
-        document.getElementById(
-            "support"
-        ).innerText =
-            data.support || 0;
-
-        document.getElementById(
-            "double_takt"
-        ).innerText =
-            data.double_takt || 0;
-
-    } catch (error) {
-
-        console.error(
-            "Fehler beim Laden der KPI:",
-            error
-        );
-
-    }
+async function loadDashboard() {
+    await loadEmployees();
+    await loadStations();
 }
 
+async function loadEmployees() {
+    try {
+        const response = await fetch(`${API_URL}/employees`);
+        const employees = await response.json();
+
+        document.getElementById("employees_total").innerText =
+            employees.length;
+
+        const available =
+            employees.filter(
+                e => e.status === "Verfügbar"
+            ).length;
+
+        const vacation =
+            employees.filter(
+                e => e.status === "Urlaub"
+            ).length;
+
+        const sick =
+            employees.filter(
+                e => e.status === "Krank"
+            ).length;
+
+        const support =
+            employees.filter(
+                e => e.status === "Support"
+            ).length;
+
+        document.getElementById("available").innerText =
+            available;
+
+        document.getElementById("vacation").innerText =
+            vacation;
+
+        document.getElementById("sick").innerText =
+            sick;
+
+        document.getElementById("support").innerText =
+            support;
+
+    } catch (error) {
+        console.error(error);
+    }
+}
 
 async function loadStations() {
 
@@ -72,39 +69,37 @@ async function loadStations() {
 
         container.innerHTML = "";
 
+        let doubleTaktCounter = 0;
+
         stations.forEach(station => {
 
-            const employee =
-                station.assigned_employee ||
-                "Nicht besetzt";
+            if (
+                station.double_takt_active
+            ) {
+                doubleTaktCounter++;
+            }
 
-            const support =
-                station.support_required
-                    ? "🔴 Support benötigt"
-                    : "";
+            const employee =
+                station.employee_1 ||
+                "Nicht besetzt";
 
             container.innerHTML += `
                 <div class="station">
                     <h3>${station.name}</h3>
-
                     <p>${employee}</p>
-
-                    <p>${support}</p>
-
                 </div>
             `;
         });
 
+        document.getElementById(
+            "double_takt"
+        ).innerText =
+            doubleTaktCounter;
+
     } catch (error) {
-
-        console.error(
-            "Fehler beim Laden der Stationen:",
-            error
-        );
-
+        console.error(error);
     }
 }
-
 
 async function runRotation() {
 
@@ -131,23 +126,18 @@ async function runRotation() {
             );
 
         await loadStations();
-        await loadStats();
 
     } catch (error) {
 
-        console.error(
-            "Rotation Fehler:",
-            error
-        );
+        document.getElementById(
+            "rotation_result"
+        ).innerText =
+            "Rotation Fehler";
 
+        console.error(error);
     }
 }
 
-
-window.onload = async () => {
-
-    await loadStats();
-
-    await loadStations();
-
+window.onload = () => {
+    loadDashboard();
 };
