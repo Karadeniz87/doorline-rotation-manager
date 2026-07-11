@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
 class Employee(BaseModel):
@@ -7,31 +8,34 @@ class Employee(BaseModel):
 
     status: str = "Verfügbar"
 
+    station: Optional[str] = None
+
     fairness_points: int = 0
 
-    skill_30L: int = 3
-    skill_30R: int = 3
+    # Skills
+    skill_30L: bool = False
+    skill_30R: bool = False
 
-    skill_40L: int = 3
-    skill_40R: int = 3
+    skill_40L: bool = False
+    skill_40R: bool = False
 
-    skill_50L: int = 3
-    skill_50R: int = 3
+    skill_50L: bool = False
+    skill_50R: bool = False
 
-    skill_60L: int = 3
-    skill_60R: int = 3
+    skill_60L: bool = False
+    skill_60R: bool = False
 
-    skill_70L: int = 3
-    skill_70R: int = 3
+    skill_70L: bool = False
+    skill_70R: bool = False
 
-    skill_80L: int = 3
-    skill_80R: int = 3
+    skill_80L: bool = False
+    skill_80R: bool = False
 
-    skill_90L: int = 3
-    skill_90R: int = 3
+    skill_90L: bool = False
+    skill_90R: bool = False
 
-    skill_100L: int = 3
-    skill_100R: int = 3
+    skill_100L: bool = False
+    skill_100R: bool = False
 
-    skill_110L: int = 3
-    skill_110R: int = 3
+    skill_110L: bool = False
+    skill_110R: bool = False
