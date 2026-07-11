@@ -1,9 +1,57 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doorline Rotation Manager</title>
+
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+
+<div class="container">
+
     <h1>Doorline Rotation Manager</h1>
+
+    <div class="cards">
+
+        <div class="card">
+            <h2>Mitarbeiter</h2>
+            <p id="employees">17</p>
+        </div>
+
+        <div class="card">
+            <h2>Verfügbar</h2>
+            <p id="available">17</p>
+        </div>
+
+        <div class="card">
+            <h2>Krank</h2>
+            <p id="sick">0</p>
+        </div>
+
+        <div class="card">
+            <h2>Urlaub</h2>
+            <p id="vacation">0</p>
+        </div>
+
+        <div class="card support">
+            <h2>Support</h2>
+            <p id="support">0</p>
+        </div>
+
+    </div>
+
+    <button id="rotationButton">
+        🔄 Rotation starten
+    </button>
+
+    <div id="rotationResult"></div>
+
+</div>
+
+<script src="app.js"></script>
+
 </body>
 </html>
