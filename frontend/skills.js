@@ -1,27 +1,19 @@
-const API_URL =
-    "https://doorline-rotation-manager.onrender.com";
-
 const STATIONS = [
-    "30L","30R",
-    "40L","40R",
-    "50L","50R",
-    "60L","60R",
-    "70L","70R",
-    "80L","80R",
-    "90L","90R",
-    "100L","100R",
-    "110L","110R"
+    "30L", "30R",
+    "40L", "40R",
+    "50L", "50R",
+    "60L", "60R",
+    "70L", "70R",
+    "80L", "80R",
+    "90L", "90R",
+    "100L", "100R",
+    "110L", "110R"
 ];
 
 async function loadSkills() {
 
-    const response =
-        await fetch(
-            `${API_URL}/employees`
-        );
-
-    const employees =
-        await response.json();
+    const response = await fetch("/employees");
+    const employees = await response.json();
 
     const container =
         document.getElementById(
@@ -30,8 +22,7 @@ async function loadSkills() {
 
     container.innerHTML = "";
 
-    employees.forEach(
-        (employee, index) => {
+    employees.forEach((employee, index) => {
 
         let html = `
             <div class="card">
@@ -44,15 +35,12 @@ async function loadSkills() {
                 <div class="skills-grid">
         `;
 
-        STATIONS.forEach(
-            station => {
+        STATIONS.forEach(station => {
 
             const checked =
-                employee[
-                    `skill_${station}`
-                ]
-                ? "checked"
-                : "";
+                employee[`skill_${station}`]
+                    ? "checked"
+                    : "";
 
             html += `
                 <label class="skill-item">
@@ -60,9 +48,9 @@ async function loadSkills() {
                         type="checkbox"
                         ${checked}
                         onchange="
-                            updateSkill(
+                            updateEmployee(
                                 ${index},
-                                '${station}',
+                                'skill_${station}',
                                 this.checked
                             )
                         "
@@ -80,13 +68,9 @@ async function loadSkills() {
                 <label class="skill-item">
                     <input
                         type="checkbox"
-                        ${
-                            employee.is_sick
-                            ? "checked"
-                            : ""
-                        }
+                        ${employee.is_sick ? "checked" : ""}
                         onchange="
-                            updateField(
+                            updateEmployee(
                                 ${index},
                                 'is_sick',
                                 this.checked
@@ -99,13 +83,9 @@ async function loadSkills() {
                 <label class="skill-item">
                     <input
                         type="checkbox"
-                        ${
-                            employee.is_vacation
-                            ? "checked"
-                            : ""
-                        }
+                        ${employee.is_vacation ? "checked" : ""}
                         onchange="
-                            updateField(
+                            updateEmployee(
                                 ${index},
                                 'is_vacation',
                                 this.checked
@@ -115,6 +95,21 @@ async function loadSkills() {
                     🏖 Urlaub
                 </label>
 
+                <p>
+                    📍 Aktuelle Station:
+                    ${employee.station || "-"}
+                </p>
+
+                <p>
+                    🔄 Letzte Station:
+                    ${employee.last_station || "-"}
+                </p>
+
+                <p>
+                    ⚖️ Fairness:
+                    ${employee.fairness_points}
+                </p>
+
             </div>
         `;
 
@@ -122,40 +117,7 @@ async function loadSkills() {
     });
 }
 
-async function updateSkill(
-    employeeId,
-    station,
-    value
-) {
-
-    const response =
-        await fetch(
-            `${API_URL}/employees/${employeeId}`
-        );
-
-    const employee =
-        await response.json();
-
-    employee[
-        `skill_${station}`
-    ] = value;
-
-    await fetch(
-        `${API_URL}/employees/${employeeId}`,
-        {
-            method: "PUT",
-            headers: {
-                "Content-Type":
-                    "application/json"
-            },
-            body: JSON.stringify(
-                employee
-            )
-        }
-    );
-}
-
-async function updateField(
+async function updateEmployee(
     employeeId,
     field,
     value
@@ -163,7 +125,7 @@ async function updateField(
 
     const response =
         await fetch(
-            `${API_URL}/employees/${employeeId}`
+            `/employees/${employeeId}`
         );
 
     const employee =
@@ -172,18 +134,18 @@ async function updateField(
     employee[field] = value;
 
     await fetch(
-        `${API_URL}/employees/${employeeId}`,
+        `/employees/${employeeId}`,
         {
             method: "PUT",
             headers: {
                 "Content-Type":
                     "application/json"
             },
-            body: JSON.stringify(
-                employee
-            )
+            body: JSON.stringify(employee)
         }
     );
+
+    loadSkills();
 }
 
 loadSkills();
