@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiter</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Mitarbeiter</h1>
+
+    <input id="firstname" placeholder="Vorname">
+    <input id="lastname" placeholder="Nachname">
+
+    <select id="status">
+        <option>Verfügbar</option>
+        <option>Urlaub</option>
+        <option>Krank</option>
+        <option>Support</option>
+        <option>Training</option>
+    </select>
+
+    <button onclick="addEmployee()">
+        ➕ Mitarbeiter hinzufügen
+    </button>
+
+    <div id="employeeList"></div>
+
+</div>
+
+<script src="employees.js"></script>
+
+</body>
+</html>
