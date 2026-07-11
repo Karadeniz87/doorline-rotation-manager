@@ -1,11 +1,9 @@
 from pydantic import BaseModel
 from typing import Optional
 
-
 class Employee(BaseModel):
     firstname: str
     lastname: str
-
     status: str = "Verfügbar"
 
     station: Optional[str] = None
