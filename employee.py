@@ -6,11 +6,13 @@ class Employee(BaseModel):
     firstname: str
     lastname: str
 
-    status: str = "Verfügbar"
-
     station: Optional[str] = None
 
     fairness_points: int = 0
+
+    # Abwesenheit
+    is_sick: bool = False
+    is_vacation: bool = False
 
     # Skills
     skill_30L: bool = False
