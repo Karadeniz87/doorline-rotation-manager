@@ -2,7 +2,11 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <title>Doorline Rotation Manager</title>
 
     <link rel="stylesheet" href="style.css">
@@ -12,42 +16,106 @@
 
 <div class="container">
 
-    <h1>Doorline Rotation Manager</h1>
+    <header>
+        <h1>🚗 Doorline Rotation Manager</h1>
+        <p>Teamlead Dashboard</p>
+    </header>
+
+    <!-- KPI Bereich -->
 
     <div class="cards">
 
         <div class="card">
-            <h2>Mitarbeiter</h2>
-            <p id="employees">17</p>
+            <h3>Mitarbeiter</h3>
+            <p id="employees_total">17</p>
         </div>
 
-        <div class="card">
-            <h2>Verfügbar</h2>
+        <div class="card green">
+            <h3>Verfügbar</h3>
             <p id="available">17</p>
         </div>
 
-        <div class="card">
-            <h2>Krank</h2>
-            <p id="sick">0</p>
-        </div>
-
-        <div class="card">
-            <h2>Urlaub</h2>
+        <div class="card yellow">
+            <h3>Urlaub</h3>
             <p id="vacation">0</p>
         </div>
 
-        <div class="card support">
-            <h2>Support</h2>
+        <div class="card red">
+            <h3>Krank</h3>
+            <p id="sick">0</p>
+        </div>
+
+        <div class="card orange">
+            <h3>Support</h3>
             <p id="support">0</p>
+        </div>
+
+        <div class="card blue">
+            <h3>Doppeltakt</h3>
+            <p id="double_takt">0</p>
         </div>
 
     </div>
 
-    <button id="rotationButton">
-        🔄 Rotation starten
-    </button>
+    <!-- Aktionen -->
 
-    <div id="rotationResult"></div>
+    <div class="actions">
+
+        <button onclick="runRotation()">
+            🔄 Rotation starten
+        </button>
+
+        <button onclick="window.location.href='employees.html'">
+            👥 Mitarbeiter
+        </button>
+
+        <button onclick="window.location.href='skills.html'">
+            ✅ Skills
+        </button>
+
+        <button onclick="window.location.href='stations.html'">
+            🏭 Stationen
+        </button>
+
+        <button onclick="window.location.href='kpi.html'">
+            📊 KPI Dashboard
+        </button>
+
+    </div>
+
+    <!-- Stationsübersicht -->
+
+    <div class="section">
+
+        <h2>Stationsübersicht</h2>
+
+        <div id="stations_container">
+
+            <div class="station">
+                <h3>30L</h3>
+                <p>Nicht besetzt</p>
+            </div>
+
+            <div class="station">
+                <h3>30R</h3>
+                <p>Nicht besetzt</p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Rotation Ergebnis -->
+
+    <div class="section">
+
+        <h2>Rotation Ergebnis</h2>
+
+        <pre id="rotation_result">
+Noch keine Rotation gestartet
+        </pre>
+
+    </div>
 
 </div>
 
