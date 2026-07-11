@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-
+from employee import Employee
 app = FastAPI(title="Doorline Rotation Manager")
 
 employees = []
