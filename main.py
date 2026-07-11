@@ -248,11 +248,24 @@ def run_rotation():
 
 @app.get("/stats")
 def stats():
+
+    sick = sum(
+        1 for e in employees
+        if e.is_sick
+    )
+
+    vacation = sum(
+        1 for e in employees
+        if e.is_vacation
+    )
+
+    available = len(employees) - sick - vacation
+
     return {
         "employees_total": len(employees),
-        "available": len(employees),
-        "vacation": 0,
-        "sick": 0,
+        "available": available,
+        "vacation": vacation,
+        "sick": sick,
         "support": 0,
         "double_takt": 0
     }
