@@ -2,6 +2,9 @@ from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import Boolean
+from sqlalchemy import DateTime
+
+from datetime import datetime
 
 from database import Base
 
@@ -10,39 +13,18 @@ class EmployeeDB(Base):
 
     __tablename__ = "employees"
 
-    id = Column(
-        Integer,
-        primary_key=True,
-        index=True
-    )
+    id = Column(Integer, primary_key=True, index=True)
 
     firstname = Column(String)
     lastname = Column(String)
 
-    station = Column(
-        String,
-        nullable=True
-    )
+    station = Column(String, nullable=True)
+    last_station = Column(String, nullable=True)
 
-    last_station = Column(
-        String,
-        nullable=True
-    )
+    fairness_points = Column(Integer, default=0)
 
-    fairness_points = Column(
-        Integer,
-        default=0
-    )
-
-    is_sick = Column(
-        Boolean,
-        default=False
-    )
-
-    is_vacation = Column(
-        Boolean,
-        default=False
-    )
+    is_sick = Column(Boolean, default=False)
+    is_vacation = Column(Boolean, default=False)
 
     skill_30L = Column(Boolean, default=False)
     skill_30R = Column(Boolean, default=False)
@@ -70,3 +52,19 @@ class EmployeeDB(Base):
 
     skill_110L = Column(Boolean, default=False)
     skill_110R = Column(Boolean, default=False)
+
+
+class RotationHistory(Base):
+
+    __tablename__ = "rotation_history"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    employee_name = Column(String)
+
+    station = Column(String)
+
+    timestamp = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
