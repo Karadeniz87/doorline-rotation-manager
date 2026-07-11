@@ -2,32 +2,64 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <title>Mitarbeiter</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <div class="container">
 
-    <h1>Mitarbeiter</h1>
+    <header>
+        <h1>👥 Mitarbeiter</h1>
+        <p>Doorline Rotation Manager</p>
+    </header>
 
-    <input id="firstname" placeholder="Vorname">
-    <input id="lastname" placeholder="Nachname">
+    <div class="section">
 
-    <select id="status">
-        <option>Verfügbar</option>
-        <option>Urlaub</option>
-        <option>Krank</option>
-        <option>Support</option>
-        <option>Training</option>
-    </select>
+        <input
+            type="text"
+            id="firstname"
+            placeholder="Vorname">
 
-    <button onclick="addEmployee()">
-        ➕ Mitarbeiter hinzufügen
+        <br><br>
+
+        <input
+            type="text"
+            id="lastname"
+            placeholder="Nachname">
+
+        <br><br>
+
+        <select id="status">
+            <option>Verfügbar</option>
+            <option>Urlaub</option>
+            <option>Krank</option>
+            <option>Support</option>
+            <option>Training</option>
+        </select>
+
+        <br><br>
+
+        <button onclick="addEmployee()">
+            ➕ Mitarbeiter hinzufügen
+        </button>
+
+    </div>
+
+    <div id="employee_list">
+
+    </div>
+
+    <br>
+
+    <button onclick="window.location.href='index.html'">
+        ← Dashboard
     </button>
-
-    <div id="employeeList"></div>
 
 </div>
 
