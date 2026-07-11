@@ -4,16 +4,15 @@ from typing import Optional
 
 class Employee(BaseModel):
 
+    # Stammdaten
     firstname: str
     lastname: str
 
-    # Aktuelle Station
+    # Aktuelle und letzte Station
     station: Optional[str] = None
-
-    # Letzte Station
     last_station: Optional[str] = None
 
-    # Fairness
+    # Fairness Punkte
     fairness_points: int = 0
 
     # Abwesenheit
