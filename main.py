@@ -8,20 +8,10 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# --------------------------------------------------
-# FRONTEND
-# --------------------------------------------------
+# Frontend bereitstellen
+app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
 
-app.mount(
-    "/frontend",
-    StaticFiles(directory="frontend"),
-    name="frontend"
-)
-
-# --------------------------------------------------
-# MITARBEITER
-# --------------------------------------------------
-
+# Mitarbeiterliste
 employees = [
     Employee(firstname="Waldemar", lastname="Krupowicz"),
     Employee(firstname="Christian", lastname="Francke"),
@@ -29,7 +19,7 @@ employees = [
     Employee(firstname="Mhd Nour", lastname="Fallah"),
     Employee(firstname="Oliwia", lastname="Budkowska"),
     Employee(firstname="Maxwell Kofi", lastname="Mensah"),
-    Employee(firstname="Adolphe", lastname="Boumsong Dimouk"),
+    Employee(firstname="Adolphe Boumsong", lastname="Dimouk"),
     Employee(firstname="Fabian", lastname="Dubaj"),
     Employee(firstname="Salh", lastname="Alamash"),
     Employee(firstname="Sarah Akuma", lastname="Ukpo"),
@@ -39,24 +29,21 @@ employees = [
     Employee(firstname="Renata", lastname="Molek"),
     Employee(firstname="Thaer", lastname="Al Gharib"),
     Employee(firstname="Kwame", lastname="Opoku"),
-    Employee(firstname="Rawad", lastname="Al Akle")
+    Employee(firstname="Rawad", lastname="Al Akle"),
 ]
 
 stations = [
-    "30L","30R",
-    "40L","40R",
-    "50L","50R",
-    "60L","60R",
-    "70L","70R",
-    "80L","80R",
-    "90L","90R",
-    "100L","100R",
-    "110L","110R"
+    "30L", "30R",
+    "40L", "40R",
+    "50L", "50R",
+    "60L", "60R",
+    "70L", "70R",
+    "80L", "80R",
+    "90L", "90R",
+    "100L", "100R",
+    "110L", "110R"
 ]
 
-# --------------------------------------------------
-# HOME
-# --------------------------------------------------
 
 @app.get("/")
 def home():
@@ -65,14 +52,8 @@ def home():
 
 @app.get("/health")
 def health():
-    return {
-        "status": "running"
-    }
+    return {"status": "running"}
 
-
-# --------------------------------------------------
-# EMPLOYEES
-# --------------------------------------------------
 
 @app.get("/employees")
 def get_employees():
@@ -81,7 +62,6 @@ def get_employees():
 
 @app.get("/employees/{employee_id}")
 def get_employee(employee_id: int):
-
     if employee_id >= len(employees):
         raise HTTPException(
             status_code=404,
@@ -93,7 +73,6 @@ def get_employee(employee_id: int):
 
 @app.post("/employees")
 def add_employee(employee: Employee):
-
     employees.append(employee)
 
     return {
@@ -103,11 +82,7 @@ def add_employee(employee: Employee):
 
 
 @app.put("/employees/{employee_id}")
-def update_employee(
-        employee_id: int,
-        employee: Employee
-):
-
+def update_employee(employee_id: int, employee: Employee):
     if employee_id >= len(employees):
         raise HTTPException(
             status_code=404,
@@ -115,13 +90,11 @@ def update_employee(
         )
 
     employees[employee_id] = employee
-
     return employees[employee_id]
 
 
 @app.delete("/employees/{employee_id}")
 def delete_employee(employee_id: int):
-
     if employee_id >= len(employees):
         raise HTTPException(
             status_code=404,
@@ -136,13 +109,8 @@ def delete_employee(employee_id: int):
     }
 
 
-# --------------------------------------------------
-# STATIONS
-# --------------------------------------------------
-
 @app.get("/stations")
 def get_stations():
-
     result = []
 
     for station in stations:
@@ -151,38 +119,28 @@ def get_stations():
             "active": True,
             "employee_1": None,
             "employee_2": None,
-            "double_takt_allowed":
-                station.startswith("40")
-                or station.startswith("50")
-                or station.startswith("60")
-                or station.startswith("70")
+            "double_takt_allowed": station.startswith(
+                ("40", "50", "60", "70")
+            )
         })
 
     return result
 
 
-# --------------------------------------------------
-# ROTATION
-# --------------------------------------------------
-
 @app.post("/rotation/run")
 def run_rotation():
-
     result = []
 
     employee_index = 0
 
     for station in stations:
-
         assigned_employee = None
 
         if employee_index < len(employees):
             assigned_employee = (
-                employees[employee_index].firstname
-                + " "
-                + employees[employee_index].lastname
+                f"{employees[employee_index].firstname} "
+                f"{employees[employee_index].lastname}"
             )
-
             employee_index += 1
 
         result.append({
@@ -199,13 +157,8 @@ def run_rotation():
     }
 
 
-# --------------------------------------------------
-# KPI
-# --------------------------------------------------
-
 @app.get("/stats")
 def stats():
-
     return {
         "employees_total": len(employees),
         "available": len(employees),
@@ -218,22 +171,19 @@ def stats():
 
 @app.get("/fairness")
 def fairness():
-
     return {
-        employee.firstname + " " + employee.lastname:
-            employee.fairness_points
-        for employee in employees
+        f"{e.firstname} {e.lastname}": e.fairness_points
+        for e in employees
     }
 
 
 @app.get("/flexibility")
 def flexibility():
-
     return {
         "double_takt_stations": [
-            "40L","40R",
-            "50L","50R",
-            "60L","60R",
-            "70L","70R"
+            "40L", "40R",
+            "50L", "50R",
+            "60L", "60R",
+            "70L", "70R"
         ]
     }
