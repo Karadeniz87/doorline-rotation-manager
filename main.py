@@ -1,6 +1,5 @@
 from fastapi import FastAPI, HTTPException
 from employee import Employee
-from station import Station
 from rotation_engine import run_rotation
 
 app = FastAPI(
@@ -9,7 +8,7 @@ app = FastAPI(
 )
 
 # =========================
-# Mitarbeiter Datenbank
+# Mitarbeiter
 # =========================
 
 employees = [
@@ -123,7 +122,7 @@ employees = [
 
 stations = []
 
-for station_name in [
+station_names = [
     "30L", "30R",
     "40L", "40R",
     "50L", "50R",
@@ -133,17 +132,23 @@ for station_name in [
     "90L", "90R",
     "100L", "100R",
     "110L", "110R"
-]:
+]
+
+double_takt_stations = [
+    "40L", "40R",
+    "50L", "50R",
+    "60L", "60R",
+    "70L", "70R"
+]
+
+for station in station_names:
     stations.append({
-        "name": station_name,
+        "name": station,
         "active": True,
-        "double_takt": station_name in [
-            "40L", "40R",
-            "50L", "50R",
-            "60L", "60R",
-            "70L", "70R"
-        ],
-        "assigned_employee": None,
+        "double_takt_allowed": station in double_takt_stations,
+        "double_takt_active": False,
+        "employee_1": None,
+        "employee_2": None,
         "support_required": False
     })
 
@@ -155,10 +160,16 @@ for station_name in [
 def home():
     return {
         "app": "Doorline Rotation Manager",
-        "version": "1.0.0",
+        "status": "running",
         "employees": len(employees),
-        "stations": len(stations),
-        "status": "running"
+        "stations": len(stations)
+    }
+
+
+@app.get("/health")
+def health():
+    return {
+        "status": "healthy"
     }
 
 # =========================
@@ -183,13 +194,8 @@ def get_employee(employee_id: int):
 
 @app.post("/employees")
 def add_employee(employee: Employee):
-    employee_data = employee.model_dump()
-    employees.append(employee_data)
-
-    return {
-        "message": "Mitarbeiter hinzugefügt",
-        "employee": employee_data
-    }
+    employees.append(employee.model_dump())
+    return employee
 
 
 @app.put("/employees/{employee_id}")
@@ -216,12 +222,7 @@ def delete_employee(employee_id: int):
             detail="Mitarbeiter nicht gefunden"
         )
 
-    deleted = employees.pop(employee_id)
-
-    return {
-        "message": "Mitarbeiter gelöscht",
-        "employee": deleted
-    }
+    return employees.pop(employee_id)
 
 # =========================
 # Stationen
@@ -234,6 +235,7 @@ def get_stations():
 
 @app.put("/stations/{station_name}/activate")
 def activate_station(station_name: str):
+
     for station in stations:
         if station["name"] == station_name:
             station["active"] = True
@@ -247,6 +249,7 @@ def activate_station(station_name: str):
 
 @app.put("/stations/{station_name}/deactivate")
 def deactivate_station(station_name: str):
+
     for station in stations:
         if station["name"] == station_name:
             station["active"] = False
@@ -274,19 +277,70 @@ def start_rotation():
 
 @app.get("/stats")
 def stats():
+
     return {
         "employees_total": len(employees),
-        "stations_total": len(stations),
-        "available": len(
-            [e for e in employees
-             if e["status"] == "Verfügbar"]
-        ),
-        "urlaub": len(
-            [e for e in employees
-             if e["status"] == "Urlaub"]
-        ),
-        "krank": len(
-            [e for e in employees
-             if e["status"] == "Krank"]
-        )
+
+        "available": len([
+            e for e in employees
+            if e.get("status") == "Verfügbar"
+        ]),
+
+        "urlaub": len([
+            e for e in employees
+            if e.get("status") == "Urlaub"
+        ]),
+
+        "krank": len([
+            e for e in employees
+            if e.get("status") == "Krank"
+        ]),
+
+        "support": len([
+            s for s in stations
+            if s.get("support_required")
+        ]),
+
+        "double_takt": len([
+            s for s in stations
+            if s.get("double_takt_active")
+        ])
     }
+
+
+@app.get("/fairness")
+def fairness():
+    return sorted(
+        employees,
+        key=lambda x: x.get(
+            "fairness_points",
+            0
+        )
+    )
+
+
+@app.get("/flexibility")
+def flexibility():
+
+    result = []
+
+    for employee in employees:
+
+        skills = len([
+            key for key, value in employee.items()
+            if key.startswith("skill_") and value
+        ])
+
+        result.append({
+            "employee":
+                f"{employee['firstname']} "
+                f"{employee['lastname']}",
+            "skills": skills
+        })
+
+    result.sort(
+        key=lambda x: x["skills"],
+        reverse=True
+    )
+
+    return result
