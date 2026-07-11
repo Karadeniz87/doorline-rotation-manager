@@ -15,78 +15,111 @@ const STATIONS = [
 
 async function loadSkills() {
 
-    try {
+    const response =
+        await fetch(
+            `${API_URL}/employees`
+        );
 
-        const response =
-            await fetch(
-                `${API_URL}/employees`
-            );
+    const employees =
+        await response.json();
 
-        const employees =
-            await response.json();
+    const container =
+        document.getElementById(
+            "skills_container"
+        );
 
-        const container =
-            document.getElementById(
-                "skills_container"
-            );
+    container.innerHTML = "";
 
-        container.innerHTML = "";
+    employees.forEach(
+        (employee, index) => {
 
-        employees.forEach(
-            (employee, index) => {
+        let html = `
+            <div class="card">
 
-            let html = `
-                <div class="card">
-                    <h2>
-                        ${employee.firstname}
-                        ${employee.lastname}
-                    </h2>
+                <h2>
+                    ${employee.firstname}
+                    ${employee.lastname}
+                </h2>
 
-                    <div class="skills-grid">
-            `;
+                <div class="skills-grid">
+        `;
 
-            STATIONS.forEach(
-                station => {
+        STATIONS.forEach(
+            station => {
 
-                const checked =
-                    employee[
-                        `skill_${station}`
-                    ]
-                        ? "checked"
-                        : "";
-
-                html += `
-                    <label class="skill-item">
-                        <input
-                            type="checkbox"
-                            ${checked}
-                            onchange="
-                                updateSkill(
-                                    ${index},
-                                    '${station}',
-                                    this.checked
-                                )
-                            "
-                        >
-                        ${station}
-                    </label>
-                `;
-            });
+            const checked =
+                employee[
+                    `skill_${station}`
+                ]
+                ? "checked"
+                : "";
 
             html += `
-                    </div>
-                </div>
+                <label class="skill-item">
+                    <input
+                        type="checkbox"
+                        ${checked}
+                        onchange="
+                            updateSkill(
+                                ${index},
+                                '${station}',
+                                this.checked
+                            )
+                        "
+                    >
+                    ${station}
+                </label>
             `;
-
-            container.innerHTML += html;
         });
 
-    } catch(error) {
+        html += `
+                </div>
 
-        console.error(
-            error
-        );
-    }
+                <hr>
+
+                <label class="skill-item">
+                    <input
+                        type="checkbox"
+                        ${
+                            employee.is_sick
+                            ? "checked"
+                            : ""
+                        }
+                        onchange="
+                            updateField(
+                                ${index},
+                                'is_sick',
+                                this.checked
+                            )
+                        "
+                    >
+                    🤒 Krank
+                </label>
+
+                <label class="skill-item">
+                    <input
+                        type="checkbox"
+                        ${
+                            employee.is_vacation
+                            ? "checked"
+                            : ""
+                        }
+                        onchange="
+                            updateField(
+                                ${index},
+                                'is_vacation',
+                                this.checked
+                            )
+                        "
+                    >
+                    🏖 Urlaub
+                </label>
+
+            </div>
+        `;
+
+        container.innerHTML += html;
+    });
 }
 
 async function updateSkill(
@@ -95,49 +128,62 @@ async function updateSkill(
     value
 ) {
 
-    try {
-
-        const response =
-            await fetch(
-                `${API_URL}/employees/${employeeId}`
-            );
-
-        const employee =
-            await response.json();
-
-        employee[
-            `skill_${station}`
-        ] = value;
-
-        const saveResponse =
-            await fetch(
-                `${API_URL}/employees/${employeeId}`,
-                {
-                    method:"PUT",
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-                    body:JSON.stringify(
-                        employee
-                    )
-                }
-            );
-
-        if(
-            saveResponse.ok
-        ){
-            console.log(
-                "Skill gespeichert"
-            );
-        }
-
-    } catch(error){
-
-        console.error(
-            error
+    const response =
+        await fetch(
+            `${API_URL}/employees/${employeeId}`
         );
-    }
+
+    const employee =
+        await response.json();
+
+    employee[
+        `skill_${station}`
+    ] = value;
+
+    await fetch(
+        `${API_URL}/employees/${employeeId}`,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type":
+                    "application/json"
+            },
+            body: JSON.stringify(
+                employee
+            )
+        }
+    );
+}
+
+async function updateField(
+    employeeId,
+    field,
+    value
+) {
+
+    const response =
+        await fetch(
+            `${API_URL}/employees/${employeeId}`
+        );
+
+    const employee =
+        await response.json();
+
+    employee[field] = value;
+
+    await fetch(
+        `${API_URL}/employees/${employeeId}`,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type":
+                    "application/json"
+            },
+            body: JSON.stringify(
+                employee
+            )
+        }
+    );
 }
 
 loadSkills();
