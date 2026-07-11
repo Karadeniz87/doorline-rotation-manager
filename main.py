@@ -7,9 +7,9 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Speicher
 employees = []
 stations = []
+
 
 # =====================================
 # HOME
@@ -153,7 +153,7 @@ def delete_station(station_id: int):
             detail="Station nicht gefunden"
         )
 
-    deleted_station = stations.pop(station_id)
+    deleted_station = stations.pop(stations_id)
 
     return {
         "message": "Station gelöscht",
