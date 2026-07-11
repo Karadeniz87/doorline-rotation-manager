@@ -8,10 +8,12 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Frontend bereitstellen
-app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
+app.mount(
+    "/frontend",
+    StaticFiles(directory="frontend"),
+    name="frontend"
+)
 
-# Mitarbeiterliste
 employees = [
     Employee(firstname="Waldemar", lastname="Krupowicz"),
     Employee(firstname="Christian", lastname="Francke"),
@@ -52,7 +54,9 @@ def home():
 
 @app.get("/health")
 def health():
-    return {"status": "running"}
+    return {
+        "status": "running"
+    }
 
 
 @app.get("/employees")
@@ -62,6 +66,7 @@ def get_employees():
 
 @app.get("/employees/{employee_id}")
 def get_employee(employee_id: int):
+
     if employee_id >= len(employees):
         raise HTTPException(
             status_code=404,
@@ -73,6 +78,7 @@ def get_employee(employee_id: int):
 
 @app.post("/employees")
 def add_employee(employee: Employee):
+
     employees.append(employee)
 
     return {
@@ -82,7 +88,11 @@ def add_employee(employee: Employee):
 
 
 @app.put("/employees/{employee_id}")
-def update_employee(employee_id: int, employee: Employee):
+def update_employee(
+    employee_id: int,
+    employee: Employee
+):
+
     if employee_id >= len(employees):
         raise HTTPException(
             status_code=404,
@@ -90,11 +100,13 @@ def update_employee(employee_id: int, employee: Employee):
         )
 
     employees[employee_id] = employee
-    return employees[employee_id]
+
+    return employee
 
 
 @app.delete("/employees/{employee_id}")
 def delete_employee(employee_id: int):
+
     if employee_id >= len(employees):
         raise HTTPException(
             status_code=404,
@@ -111,20 +123,7 @@ def delete_employee(employee_id: int):
 
 @app.get("/stations")
 def get_stations():
-    result = []
-
-    for station in stations:
-        result.append({
-            "name": station,
-            "active": True,
-            "employee_1": None,
-            "employee_2": None,
-            "double_takt_allowed": station.startswith(
-                ("40", "50", "60", "70")
-            )
-        })
-
-    return result
+    return stations
 
 
 @app.post("/rotation/run")
@@ -141,18 +140,15 @@ def run_rotation():
 
         for employee in employees:
 
-            # Krank oder Urlaub überspringen
             if employee.is_sick:
                 continue
 
             if employee.is_vacation:
                 continue
 
-            # Mitarbeiter nur einmal einsetzen
             if employee.lastname in assigned_employees:
                 continue
 
-            # Prüfen ob Mitarbeiter die Station beherrscht
             if getattr(employee, skill_name, False):
 
                 assigned_employee = (
@@ -160,31 +156,26 @@ def run_rotation():
                     f"{employee.lastname}"
                 )
 
+                employee.station = station
+                employee.fairness_points += 1
+
                 assigned_employees.add(
                     employee.lastname
                 )
-
-                employee.station = station
-                employee.fairness_points += 1
 
                 break
 
         result.append({
             "name": station,
-            "active": True,
             "employee_1": assigned_employee,
             "employee_2": None,
-            "support_required": False,
-            "double_takt_allowed": station.startswith(
-                ("40", "50", "60", "70")
-            )
+            "double_takt_allowed":
+                station.startswith(
+                    ("40", "50", "60", "70")
+                )
         })
 
-    # Support Mitarbeiter sammeln
     for employee in employees:
-
-        if employee.lastname in assigned_employees:
-            continue
 
         if employee.is_sick:
             continue
@@ -192,57 +183,20 @@ def run_rotation():
         if employee.is_vacation:
             continue
 
-        support_employees.append(
-            f"{employee.firstname} {employee.lastname}"
+        fullname = (
+            f"{employee.firstname} "
+            f"{employee.lastname}"
         )
 
-    return {
-        "message": "Rotation durchgeführt",
-        "assigned_employees": len(assigned_employees),
-        "support_employees": support_employees,
-        "stations": result
-    }
-
-        result.append({
-            "name": station,
-            "active": True,
-            "employee_1": assigned_employee,
-            "employee_2": None,
-            "support_required": False,
-            "double_takt_allowed": station.startswith(
-                ("40", "50", "60", "70")
+        if employee.lastname not in assigned_employees:
+            support_employees.append(
+                fullname
             )
-        })
 
     return {
         "message": "Rotation durchgeführt",
-        "stations": result
-    }
-    result = []
-
-    employee_index = 0
-
-    for station in stations:
-        assigned_employee = None
-
-        if employee_index < len(employees):
-            assigned_employee = (
-                f"{employees[employee_index].firstname} "
-                f"{employees[employee_index].lastname}"
-            )
-            employee_index += 1
-
-        result.append({
-            "name": station,
-            "active": True,
-            "employee_1": assigned_employee,
-            "employee_2": None,
-            "support_required": False
-        })
-
-    return {
-        "message": "Rotation durchgeführt",
-        "stations": result
+        "stations": result,
+        "support_employees": support_employees
     }
 
 
@@ -273,14 +227,17 @@ def stats():
 
 @app.get("/fairness")
 def fairness():
+
     return {
-        f"{e.firstname} {e.lastname}": e.fairness_points
+        f"{e.firstname} {e.lastname}":
+            e.fairness_points
         for e in employees
     }
 
 
 @app.get("/flexibility")
 def flexibility():
+
     return {
         "double_takt_stations": [
             "40L", "40R",
