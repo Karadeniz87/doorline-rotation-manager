@@ -1,105 +1,98 @@
-const API =
+const API_URL =
     "https://doorline-rotation-manager.onrender.com";
-
 
 async function loadEmployees() {
 
     const response =
-        await fetch(`${API}/employees`);
+        await fetch(
+            `${API_URL}/employees`
+        );
 
     const employees =
         await response.json();
 
     const container =
         document.getElementById(
-            "employee_list"
+            "employees_container"
         );
 
     container.innerHTML = "";
 
-    employees.forEach((employee, index) => {
+    employees.forEach(
+        (employee, index) => {
 
         container.innerHTML += `
             <div class="card">
 
-                <h3>
+                <h2>
                     ${employee.firstname}
                     ${employee.lastname}
-                </h3>
+                </h2>
 
-                <p>
-                    Status:
-                    ${employee.status}
-                </p>
+                <label class="skill-item">
+                    <input
+                        type="checkbox"
+                        ${employee.is_sick ? "checked" : ""}
+                        onchange="
+                            updateEmployee(
+                                ${index},
+                                'is_sick',
+                                this.checked
+                            )
+                        "
+                    >
+                    🤒 Krank
+                </label>
 
-                <p>
-                    Fairness:
-                    ${employee.fairness_points || 0}
-                </p>
-
-                <button
-                    onclick="deleteEmployee(${index})">
-
-                    🗑 Löschen
-
-                </button>
+                <label class="skill-item">
+                    <input
+                        type="checkbox"
+                        ${employee.is_vacation ? "checked" : ""}
+                        onchange="
+                            updateEmployee(
+                                ${index},
+                                'is_vacation',
+                                this.checked
+                            )
+                        "
+                    >
+                    🏖 Urlaub
+                </label>
 
             </div>
         `;
     });
 }
 
+async function updateEmployee(
+    employeeId,
+    field,
+    value
+) {
 
-async function addEmployee() {
+    const response =
+        await fetch(
+            `${API_URL}/employees/${employeeId}`
+        );
 
-    const firstname =
-        document.getElementById(
-            "firstname"
-        ).value;
+    const employee =
+        await response.json();
 
-    const lastname =
-        document.getElementById(
-            "lastname"
-        ).value;
-
-    const status =
-        document.getElementById(
-            "status"
-        ).value;
+    employee[field] = value;
 
     await fetch(
-        `${API}/employees`,
+        `${API_URL}/employees/${employeeId}`,
         {
-            method: "POST",
-
+            method: "PUT",
             headers: {
                 "Content-Type":
                     "application/json"
             },
-
-            body: JSON.stringify({
-                firstname,
-                lastname,
-                status,
-                fairness_points: 0
-            })
+            body: JSON.stringify(
+                employee
+            )
         }
     );
-
-    loadEmployees();
-}
-
-
-async function deleteEmployee(id) {
-
-    await fetch(
-        `${API}/employees/${id}`,
-        {
-            method: "DELETE"
-        }
-    );
-
-    loadEmployees();
 }
 
 loadEmployees();
