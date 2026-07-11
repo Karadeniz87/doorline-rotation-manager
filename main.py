@@ -11,9 +11,9 @@ employees = []
 stations = []
 
 
-# =====================================
+# =====================
 # HOME
-# =====================================
+# =====================
 
 @app.get("/")
 def home():
@@ -31,9 +31,9 @@ def health():
     }
 
 
-# =====================================
+# =====================
 # EMPLOYEES
-# =====================================
+# =====================
 
 @app.get("/employees")
 def get_employees():
@@ -54,7 +54,6 @@ def get_employee(employee_id: int):
 @app.post("/employees")
 def add_employee(employee: Employee):
     employee_data = employee.model_dump()
-
     employees.append(employee_data)
 
     return {
@@ -96,9 +95,9 @@ def delete_employee(employee_id: int):
     }
 
 
-# =====================================
+# =====================
 # STATIONS
-# =====================================
+# =====================
 
 @app.get("/stations")
 def get_stations():
@@ -119,7 +118,6 @@ def get_station(station_id: int):
 @app.post("/stations")
 def add_station(station: Station):
     station_data = station.model_dump()
-
     stations.append(station_data)
 
     return {
@@ -153,7 +151,7 @@ def delete_station(station_id: int):
             detail="Station nicht gefunden"
         )
 
-    deleted_station = stations.pop(stations_id)
+    deleted_station = stations.pop(station_id)
 
     return {
         "message": "Station gelöscht",
@@ -161,9 +159,9 @@ def delete_station(station_id: int):
     }
 
 
-# =====================================
+# =====================
 # KPI
-# =====================================
+# =====================
 
 @app.get("/stats")
 def stats():
