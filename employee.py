@@ -10,6 +10,9 @@ class Employee(BaseModel):
     # Aktuelle Station
     station: Optional[str] = None
 
+    # Letzte Station
+    last_station: Optional[str] = None
+
     # Fairness
     fairness_points: int = 0
 
