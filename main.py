@@ -23,8 +23,5 @@ def get_employees():
 
 @app.post("/employees")
 def add_employee(employee: Employee):
-    employees.append(employee.dict())
-    return {
-        "message": "Mitarbeiter hinzugefügt",
-        "employee": employee
-    }
+    employees.append(employee.model_dump())
+    return employee
