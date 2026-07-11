@@ -132,20 +132,23 @@ def run_rotation():
 
     result = []
     assigned_employees = set()
+    support_employees = []
 
     for station in stations:
 
         assigned_employee = None
-
         skill_name = f"skill_{station}"
 
         for employee in employees:
 
-            # Nur verfügbare Mitarbeiter
-            if employee.status != "Verfügbar":
+            # Krank oder Urlaub überspringen
+            if employee.is_sick:
                 continue
 
-            # Mitarbeiter nicht doppelt einsetzen
+            if employee.is_vacation:
+                continue
+
+            # Mitarbeiter nur einmal einsetzen
             if employee.lastname in assigned_employees:
                 continue
 
@@ -161,7 +164,44 @@ def run_rotation():
                     employee.lastname
                 )
 
+                employee.station = station
+                employee.fairness_points += 1
+
                 break
+
+        result.append({
+            "name": station,
+            "active": True,
+            "employee_1": assigned_employee,
+            "employee_2": None,
+            "support_required": False,
+            "double_takt_allowed": station.startswith(
+                ("40", "50", "60", "70")
+            )
+        })
+
+    # Support Mitarbeiter sammeln
+    for employee in employees:
+
+        if employee.lastname in assigned_employees:
+            continue
+
+        if employee.is_sick:
+            continue
+
+        if employee.is_vacation:
+            continue
+
+        support_employees.append(
+            f"{employee.firstname} {employee.lastname}"
+        )
+
+    return {
+        "message": "Rotation durchgeführt",
+        "assigned_employees": len(assigned_employees),
+        "support_employees": support_employees,
+        "stations": result
+    }
 
         result.append({
             "name": station,
