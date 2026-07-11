@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from employee import Employee
 from station import Station
-
+from rotation_engine import run_rotation
 app = FastAPI(
     title="Doorline Rotation Manager",
     version="1.0.0"
@@ -211,6 +211,12 @@ def run_rotation():
         "stations": stations,
         "support_needed": support_needed
     }
+    @app.post("/rotation/run")
+def start_rotation():
+    return run_rotation(
+        employees,
+        stations
+    )
 
 
 # =====================================
