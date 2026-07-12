@@ -263,15 +263,18 @@ def get_stations():
 def run_rotation(
     db: Session = Depends(get_db)
 ):
-
     employees = db.query(EmployeeDB).all()
 
-    assigned = set()
-    result = []
-    support = []
+    assigned_ids = set()
+    rotation_result = []
+    support_employees = []
 
-    employees_sorted = sorted(
-        employees,
+    active_employees = [
+        e for e in employees
+        if not e.is_sick and not e.is_vacation
+    ]
+
+    active_employees.sort(
         key=lambda x: x.fairness_points
     )
 
@@ -280,18 +283,9 @@ def run_rotation(
         selected = None
         skill_name = f"skill_{station}"
 
-        for employee in employees_sorted:
+        for employee in active_employees:
 
-            if employee.id in assigned:
-                continue
-
-            if employee.is_sick:
-                continue
-
-            if employee.is_vacation:
-                continue
-
-            if employee.last_station == station:
+            if employee.id in assigned_ids:
                 continue
 
             if not getattr(
@@ -302,45 +296,38 @@ def run_rotation(
                 continue
 
             selected = employee
+            assigned_ids.add(employee.id)
 
             employee.last_station = employee.station
             employee.station = station
             employee.fairness_points += 1
 
-            db.add(
-                RotationHistory(
-                    employee_name=
-                        f"{employee.firstname} {employee.lastname}",
-                    station=station
-                )
-            )
-
-            assigned.add(employee.id)
-
             break
 
-        result.append({
-            "name": station,
-            "employee_1":
-                None if selected is None
-                else f"{selected.firstname} {selected.lastname}",
-            "employee_2": None,
-            "support_required":
-                selected is None,
-            "double_takt_allowed":
-                station in double_takt_stations
-        })
+        rotation_result.append(
+            {
+                "name": station,
+                "employee_1":
+                    f"{selected.firstname} {selected.lastname}"
+                    if selected else None,
 
-    for employee in employees:
+                "employee_2": None,
 
-        if (
-            employee.id not in assigned
-            and not employee.is_sick
-            and not employee.is_vacation
-        ):
+                "support_required":
+                    selected is None,
+
+                "double_takt_allowed":
+                    station in double_takt_stations
+            }
+        )
+
+    for employee in active_employees:
+
+        if employee.id not in assigned_ids:
+
             employee.station = "Support"
 
-            support.append(
+            support_employees.append(
                 f"{employee.firstname} "
                 f"{employee.lastname}"
             )
@@ -349,8 +336,8 @@ def run_rotation(
 
     return {
         "message": "Rotation durchgeführt",
-        "stations": result,
-        "support_employees": support
+        "stations": rotation_result,
+        "support_employees": support_employees
     }
 
 # --------------------------------------------------
