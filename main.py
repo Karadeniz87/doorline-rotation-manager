@@ -262,9 +262,14 @@ def run_rotation(
 ):
     employees = db.query(EmployeeDB).all()
 
+    active_employees = [
+        e for e in employees
+        if not e.is_sick and not e.is_vacation
+    ]
+
     return {
         "employees_found": len(employees),
-        "stations_found": len(stations)
+        "active_employees": len(active_employees)
     }
 
 # --------------------------------------------------
