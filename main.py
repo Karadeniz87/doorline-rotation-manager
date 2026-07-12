@@ -260,84 +260,9 @@ def get_stations():
 # --------------------------------------------------
 
 @app.post("/rotation/run")
-def run_rotation(
-    db: Session = Depends(get_db)
-):
-    employees = db.query(EmployeeDB).all()
-
-    assigned_ids = set()
-    rotation_result = []
-    support_employees = []
-
-    active_employees = [
-        e for e in employees
-        if not e.is_sick and not e.is_vacation
-    ]
-
-    active_employees.sort(
-        key=lambda x: x.fairness_points
-    )
-
-    for station in stations:
-
-        selected = None
-        skill_name = f"skill_{station}"
-
-        for employee in active_employees:
-
-            if employee.id in assigned_ids:
-                continue
-
-            if not getattr(
-                employee,
-                skill_name,
-                False
-            ):
-                continue
-
-            selected = employee
-            assigned_ids.add(employee.id)
-
-            employee.last_station = employee.station
-            employee.station = station
-            employee.fairness_points += 1
-
-            break
-
-        rotation_result.append(
-            {
-                "name": station,
-                "employee_1":
-                    f"{selected.firstname} {selected.lastname}"
-                    if selected else None,
-
-                "employee_2": None,
-
-                "support_required":
-                    selected is None,
-
-                "double_takt_allowed":
-                    station in double_takt_stations
-            }
-        )
-
-    for employee in active_employees:
-
-        if employee.id not in assigned_ids:
-
-            employee.station = "Support"
-
-            support_employees.append(
-                f"{employee.firstname} "
-                f"{employee.lastname}"
-            )
-
-    db.commit()
-
+def run_rotation():
     return {
-        "message": "Rotation durchgeführt",
-        "stations": rotation_result,
-        "support_employees": support_employees
+        "message": "Rotation OK"
     }
 
 # --------------------------------------------------
