@@ -1,151 +1,140 @@
-const STATIONS = [
-    "30L", "30R",
-    "40L", "40R",
-    "50L", "50R",
-    "60L", "60R",
-    "70L", "70R",
-    "80L", "80R",
-    "90L", "90R",
-    "100L", "100R",
-    "110L", "110R"
+const stations = [
+    "30L","30R",
+    "40L","40R",
+    "50L","50R",
+    "60L","60R",
+    "70L","70R",
+    "80L","80R",
+    "90L","90R",
+    "100L","100R",
+    "110L","110R"
 ];
 
 async function loadSkills() {
 
-    const response = await fetch("/employees");
-    const employees = await response.json();
+    try {
 
-    const container =
-        document.getElementById(
-            "skills_container"
-        );
+        const response = await fetch("/employees");
+        const employees = await response.json();
 
-    container.innerHTML = "";
+        const container =
+            document.getElementById(
+                "skills_container"
+            );
 
-    employees.forEach((employee, index) => {
+        container.innerHTML = "";
 
-        let html = `
-            <div class="card">
+        employees.forEach(employee => {
 
-                <h2>
-                    ${employee.firstname}
-                    ${employee.lastname}
-                </h2>
+            let skillsHtml = "";
 
-                <div class="skills-grid">
-        `;
+            stations.forEach(station => {
 
-        STATIONS.forEach(station => {
+                const skillName =
+                    `skill_${station}`;
 
-            const checked =
-                employee[`skill_${station}`]
-                    ? "checked"
-                    : "";
+                skillsHtml += `
+                    <label class="skill-item">
 
-            html += `
-                <label class="skill-item">
-                    <input
-                        type="checkbox"
-                        ${checked}
-                        onchange="
-                            updateEmployee(
-                                ${index},
-                                'skill_${station}',
-                                this.checked
-                            )
-                        "
-                    >
-                    ${station}
-                </label>
+                        <input
+                            type="checkbox"
+                            ${employee[skillName] ? "checked" : ""}
+                            onchange="
+                                updateSkill(
+                                    ${employee.id},
+                                    '${skillName}',
+                                    this.checked
+                                )
+                            "
+                        >
+
+                        ${station}
+
+                    </label>
+                `;
+            });
+
+            container.innerHTML += `
+                <div class="employee-card">
+
+                    <h3>
+                        ${employee.firstname}
+                        ${employee.lastname}
+                    </h3>
+
+                    <div class="skills-grid">
+                        ${skillsHtml}
+                    </div>
+
+                </div>
             `;
         });
 
-        html += `
-                </div>
+    } catch (error) {
 
-                <hr>
-
-                <label class="skill-item">
-                    <input
-                        type="checkbox"
-                        ${employee.is_sick ? "checked" : ""}
-                        onchange="
-                            updateEmployee(
-                                ${index},
-                                'is_sick',
-                                this.checked
-                            )
-                        "
-                    >
-                    🤒 Krank
-                </label>
-
-                <label class="skill-item">
-                    <input
-                        type="checkbox"
-                        ${employee.is_vacation ? "checked" : ""}
-                        onchange="
-                            updateEmployee(
-                                ${index},
-                                'is_vacation',
-                                this.checked
-                            )
-                        "
-                    >
-                    🏖 Urlaub
-                </label>
-
-                <p>
-                    📍 Aktuelle Station:
-                    ${employee.station || "-"}
-                </p>
-
-                <p>
-                    🔄 Letzte Station:
-                    ${employee.last_station || "-"}
-                </p>
-
-                <p>
-                    ⚖️ Fairness:
-                    ${employee.fairness_points}
-                </p>
-
-            </div>
-        `;
-
-        container.innerHTML += html;
-    });
+        console.error(
+            "Fehler beim Laden:",
+            error
+        );
+    }
 }
 
-async function updateEmployee(
+async function updateSkill(
     employeeId,
-    field,
+    skillName,
     value
 ) {
 
-    const response =
-        await fetch(
-            `/employees/${employeeId}`
+    try {
+
+        const employeeResponse =
+            await fetch(
+                `/employees/${employeeId}`
+            );
+
+        const employee =
+            await employeeResponse.json();
+
+        employee[skillName] = value;
+
+        const saveResponse =
+            await fetch(
+                `/employees/${employeeId}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body: JSON.stringify(
+                        employee
+                    )
+                }
+            );
+
+        if (!saveResponse.ok) {
+            throw new Error(
+                "Speichern fehlgeschlagen"
+            );
+        }
+
+        console.log(
+            `${skillName} gespeichert`
         );
 
-    const employee =
-        await response.json();
+    } catch (error) {
 
-    employee[field] = value;
+        console.error(
+            "Speicherfehler:",
+            error
+        );
 
-    await fetch(
-        `/employees/${employeeId}`,
-        {
-            method: "PUT",
-            headers: {
-                "Content-Type":
-                    "application/json"
-            },
-            body: JSON.stringify(employee)
-        }
-    );
-
-    loadSkills();
+        alert(
+            "Skill konnte nicht gespeichert werden."
+        );
+    }
 }
 
-loadSkills();
+window.onload = function () {
+    loadSkills();
+};
