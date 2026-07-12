@@ -243,18 +243,15 @@ def delete_employee(
 # Stationen
 # --------------------------------------------------
 
-@app.get("/stations")
-def get_stations():
+@app.post("/rotation/run")
+def run_rotation(
+    db: Session = Depends(get_db)
+):
+    employees = db.query(EmployeeDB).all()
 
-    return [
-        {
-            "name": station,
-            "double_takt_allowed":
-                station in double_takt_stations
-        }
-        for station in stations
-    ]
-
+    return {
+        "employees_found": len(employees)
+    }
 # --------------------------------------------------
 # Rotation
 # --------------------------------------------------
