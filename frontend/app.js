@@ -1,6 +1,7 @@
 async function loadStats() {
 
     try {
+
         const response = await fetch("/stats");
         const stats = await response.json();
 
@@ -23,7 +24,62 @@ async function loadStats() {
             stats.double_takt || 0;
 
     } catch (error) {
-        console.error("Fehler beim Laden der KPIs:", error);
+        console.error(
+            "Fehler beim Laden der KPIs:",
+            error
+        );
+    }
+}
+
+
+async function loadStations() {
+
+    try {
+
+        const response =
+            await fetch("/stations");
+
+        const stations =
+            await response.json();
+
+        const container =
+            document.getElementById(
+                "stations_container"
+            );
+
+        if (!container) return;
+
+        container.innerHTML = "";
+
+        stations.forEach(station => {
+
+            container.innerHTML += `
+                <div class="station-card">
+
+                    <h3>${station.name}</h3>
+
+                    <p>👤 Nicht besetzt</p>
+
+                    ${
+                        station.double_takt_allowed
+                        ? `
+                        <small>
+                            🔵 Doppeltakt möglich
+                        </small>
+                        `
+                        : ""
+                    }
+
+                </div>
+            `;
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Stationsfehler:",
+            error
+        );
     }
 }
 
@@ -32,26 +88,28 @@ async function runRotation() {
 
     try {
 
-        const response = await fetch(
-            "/rotation/run",
-            {
-                method: "POST"
-            }
-        );
+        const response =
+            await fetch(
+                "/rotation/run",
+                {
+                    method: "POST"
+                }
+            );
 
-        const data = await response.json();
+        const data =
+            await response.json();
 
-        const stationsContainer =
+        const container =
             document.getElementById(
                 "stations_container"
             );
 
-        stationsContainer.innerHTML = "";
+        container.innerHTML = "";
 
         data.stations.forEach(station => {
 
-            stationsContainer.innerHTML += `
-                <div class="station">
+            container.innerHTML += `
+                <div class="station-card">
 
                     <h3>${station.name}</h3>
 
@@ -86,7 +144,10 @@ async function runRotation() {
                     ${
                         station.support_required
                         ? `
-                        <p style="color:red;">
+                        <p style="
+                            color:red;
+                            font-weight:bold;
+                        ">
                             Support benötigt
                         </p>
                         `
@@ -102,14 +163,18 @@ async function runRotation() {
                 "rotation_result"
             );
 
-        result.innerText =
-            JSON.stringify(
-                data,
-                null,
-                2
-            );
+        if (result) {
+            result.innerText =
+                JSON.stringify(
+                    data,
+                    null,
+                    2
+                );
+        }
 
         loadStats();
+        loadHistory();
+        loadFairness();
 
     } catch (error) {
 
@@ -118,49 +183,70 @@ async function runRotation() {
             error
         );
 
-        document.getElementById(
-            "rotation_result"
-        ).innerText =
-            "Fehler bei der Rotation.";
+        const result =
+            document.getElementById(
+                "rotation_result"
+            );
+
+        if (result) {
+            result.innerText =
+                "Fehler bei der Rotation.";
+        }
     }
 }
 
 
-async function loadStations() {
+async function loadEmployees() {
 
     try {
 
         const response =
-            await fetch("/stations");
+            await fetch("/employees");
 
-        const stations =
+        const employees =
             await response.json();
 
         const container =
             document.getElementById(
-                "stations_container"
+                "employees_container"
             );
 
-        if (container.innerHTML !== "") {
-            return;
-        }
+        if (!container) return;
 
-        stations.forEach(station => {
+        container.innerHTML = "";
+
+        employees.forEach(employee => {
 
             container.innerHTML += `
-                <div class="station">
+                <div class="employee-card">
 
-                    <h3>${station.name}</h3>
+                    <h3>
+                        ${employee.firstname}
+                        ${employee.lastname}
+                    </h3>
 
-                    <p>Nicht besetzt</p>
+                    <p>
+                        Station:
+                        ${
+                            employee.station
+                            || "-"
+                        }
+                    </p>
+
+                    <p>
+                        Fairness:
+                        ${employee.fairness_points}
+                    </p>
 
                     ${
-                        station.double_takt_allowed
-                        ? `
-                        <small>
-                            🔵 Doppeltakt möglich
-                        </small>
-                        `
+                        employee.is_sick
+                        ? "<p>🤒 Krank</p>"
+                        : ""
+                    }
+
+                    ${
+                        employee.is_vacation
+                        ? "<p>🌴 Urlaub</p>"
                         : ""
                     }
 
@@ -169,8 +255,105 @@ async function loadStations() {
         });
 
     } catch (error) {
+
         console.error(
-            "Stationsfehler:",
+            "Employee Fehler:",
+            error
+        );
+    }
+}
+
+
+async function loadFairness() {
+
+    try {
+
+        const response =
+            await fetch("/fairness");
+
+        const fairness =
+            await response.json();
+
+        const container =
+            document.getElementById(
+                "fairness_container"
+            );
+
+        if (!container) return;
+
+        container.innerHTML = "";
+
+        Object.entries(
+            fairness
+        ).forEach(
+            ([name, points]) => {
+
+                container.innerHTML += `
+                    <div class="fairness-item">
+
+                        <strong>
+                            ${name}
+                        </strong>
+
+                        <span>
+                            ${points}
+                        </span>
+
+                    </div>
+                `;
+            }
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Fairness Fehler:",
+            error
+        );
+    }
+}
+
+
+async function loadHistory() {
+
+    try {
+
+        const response =
+            await fetch("/history");
+
+        const history =
+            await response.json();
+
+        const container =
+            document.getElementById(
+                "history_container"
+            );
+
+        if (!container) return;
+
+        container.innerHTML = "";
+
+        history.forEach(entry => {
+
+            container.innerHTML += `
+                <div class="history-item">
+
+                    <strong>
+                        ${entry.employee_name}
+                    </strong>
+
+                    →
+
+                    ${entry.station}
+
+                </div>
+            `;
+        });
+
+    } catch (error) {
+
+        console.error(
+            "History Fehler:",
             error
         );
     }
@@ -183,4 +366,9 @@ window.onload = function () {
 
     loadStations();
 
+    loadEmployees();
+
+    loadFairness();
+
+    loadHistory();
 };
