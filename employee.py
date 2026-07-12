@@ -41,3 +41,21 @@ class Employee(BaseModel):
 
     skill_110L: bool = False
     skill_110R: bool = False
+from pydantic import BaseModel, ConfigDict
+from typing import Optional
+
+class Employee(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    firstname: str
+    lastname: str
+
+    station: Optional[str] = None
+    last_station: Optional[str] = None
+
+    fairness_points: int = 0
+
+    is_sick: bool = False
+    is_vacation: bool = False
+
+    # deine Skills bleiben unverändert
