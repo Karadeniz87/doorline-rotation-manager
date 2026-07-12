@@ -260,14 +260,67 @@ def run_rotation(
 def run_rotation(
     db: Session = Depends(get_db)
 ):
-    employee = db.query(EmployeeDB).first()
+    employees = db.query(EmployeeDB).all()
+
+    assigned_ids = set()
+    rotation_result = []
+    support_employees = []
+
+    active_employees = [
+        e for e in employees
+        if not e.is_sick and not e.is_vacation
+    ]
+
+    active_employees.sort(
+        key=lambda x: x.fairness_points
+    )
+
+    for station in stations:
+
+        skill_name = f"skill_{station}"
+        selected = None
+
+        for employee in active_employees:
+
+            if employee.id in assigned_ids:
+                continue
+
+            if getattr(employee, skill_name, False):
+
+                selected = employee
+                assigned_ids.add(employee.id)
+
+                employee.last_station = employee.station
+                employee.station = station
+                employee.fairness_points += 1
+
+                break
+
+        rotation_result.append({
+            "name": station,
+            "employee_1":
+                f"{selected.firstname} {selected.lastname}"
+                if selected else None,
+            "employee_2": None,
+            "support_required": selected is None,
+            "double_takt_allowed":
+                station in double_takt_stations
+        })
+
+    for employee in active_employees:
+        if employee.id not in assigned_ids:
+            employee.station = "Support"
+
+            support_employees.append(
+                f"{employee.firstname} {employee.lastname}"
+            )
+
+    db.commit()
 
     return {
-        "name": employee.firstname,
-        "skill_40L": employee.skill_40L,
-        "skill_40R": employee.skill_40R,
-        "skill_50L": employee.skill_50L,
-        "skill_50R": employee.skill_50R
+        "message": "Rotation durchgeführt",
+        "stations": rotation_result,
+        "support_employees": support_employees
     }
 
 # --------------------------------------------------
