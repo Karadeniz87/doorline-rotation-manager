@@ -257,9 +257,14 @@ def run_rotation(
 # --------------------------------------------------
 
 @app.post("/rotation/run")
-def run_rotation():
+def run_rotation(
+    db: Session = Depends(get_db)
+):
+    employees = db.query(EmployeeDB).all()
+
     return {
-        "message": "Rotation OK"
+        "employees_found": len(employees),
+        "stations_found": len(stations)
     }
 
 # --------------------------------------------------
