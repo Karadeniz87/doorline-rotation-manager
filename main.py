@@ -277,8 +277,8 @@ def run_rotation(
 
     for station in stations:
 
-        skill_name = f"skill_{station}"
         selected = None
+        skill_name = f"skill_{station}"
 
         for employee in active_employees:
 
@@ -308,9 +308,7 @@ def run_rotation(
         })
 
     for employee in active_employees:
-
         if employee.id not in assigned_ids:
-
             employee.station = "Support"
 
             support_employees.append(
