@@ -11,7 +11,7 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Doorline Rotation Manager",
-    version="9.0.0"
+    version="10.0.0"
 )
 
 app.mount(
@@ -21,37 +21,41 @@ app.mount(
 )
 
 # ----------------------------------------------------
-# Mitarbeiter automatisch anlegen
+# Seed Mitarbeiter
 # ----------------------------------------------------
 
-db_seed = SessionLocal()
+def seed_employees():
+    db = SessionLocal()
 
-if db_seed.query(EmployeeDB).count() == 0:
+    if db.query(EmployeeDB).count() == 0:
 
-    employees_seed = [
-        EmployeeDB(firstname="Waldemar", lastname="Krupowicz"),
-        EmployeeDB(firstname="Christian", lastname="Francke"),
-        EmployeeDB(firstname="Cagliyan", lastname="Aslandag"),
-        EmployeeDB(firstname="Mhd Nour", lastname="Fallah"),
-        EmployeeDB(firstname="Oliwia", lastname="Budkowska"),
-        EmployeeDB(firstname="Maxwell Kofi", lastname="Mensah"),
-        EmployeeDB(firstname="Adolphe Boumsong", lastname="Dimouk"),
-        EmployeeDB(firstname="Fabian", lastname="Dubaj"),
-        EmployeeDB(firstname="Salh", lastname="Alamash"),
-        EmployeeDB(firstname="Sarah Akuma", lastname="Ukpo"),
-        EmployeeDB(firstname="Germay", lastname="Mehari"),
-        EmployeeDB(firstname="Karolina", lastname="Włodarczyk"),
-        EmployeeDB(firstname="Md Jowel", lastname="Hossain"),
-        EmployeeDB(firstname="Renata", lastname="Molek"),
-        EmployeeDB(firstname="Thaer", lastname="Al Gharib"),
-        EmployeeDB(firstname="Kwame", lastname="Opoku"),
-        EmployeeDB(firstname="Rawad", lastname="Al Akle")
-    ]
+        employees_seed = [
+            EmployeeDB(firstname="Waldemar", lastname="Krupowicz"),
+            EmployeeDB(firstname="Christian", lastname="Francke"),
+            EmployeeDB(firstname="Cagliyan", lastname="Aslandag"),
+            EmployeeDB(firstname="Mhd Nour", lastname="Fallah"),
+            EmployeeDB(firstname="Oliwia", lastname="Budkowska"),
+            EmployeeDB(firstname="Maxwell Kofi", lastname="Mensah"),
+            EmployeeDB(firstname="Adolphe Boumsong", lastname="Dimouk"),
+            EmployeeDB(firstname="Fabian", lastname="Dubaj"),
+            EmployeeDB(firstname="Salh", lastname="Alamash"),
+            EmployeeDB(firstname="Sarah Akuma", lastname="Ukpo"),
+            EmployeeDB(firstname="Germay", lastname="Mehari"),
+            EmployeeDB(firstname="Karolina", lastname="Włodarczyk"),
+            EmployeeDB(firstname="Md Jowel", lastname="Hossain"),
+            EmployeeDB(firstname="Renata", lastname="Molek"),
+            EmployeeDB(firstname="Thaer", lastname="Al Gharib"),
+            EmployeeDB(firstname="Kwame", lastname="Opoku"),
+            EmployeeDB(firstname="Rawad", lastname="Al Akle")
+        ]
 
-    db_seed.add_all(employees_seed)
-    db_seed.commit()
+        db.add_all(employees_seed)
+        db.commit()
 
-db_seed.close()
+    db.close()
+
+
+seed_employees()
 
 # ----------------------------------------------------
 # Stationen
@@ -69,15 +73,15 @@ stations = [
     "110L", "110R"
 ]
 
-double_takt_stations = [
+double_takt_stations = {
     "40L", "40R",
     "50L", "50R",
     "60L", "60R",
     "70L", "70R"
-]
+}
 
 # ----------------------------------------------------
-# Datenbank Session
+# Datenbank
 # ----------------------------------------------------
 
 def get_db():
@@ -99,11 +103,13 @@ def home():
 @app.get("/health")
 def health():
     return {
-        "status": "running"
+        "status": "running",
+        "python": "3.14",
+        "pydantic": "2.x"
     }
 
 # ----------------------------------------------------
-# Mitarbeiter
+# Employees
 # ----------------------------------------------------
 
 @app.get("/employees")
@@ -118,12 +124,11 @@ def get_employee(
     employee_id: int,
     db: Session = Depends(get_db)
 ):
-
     employee = db.query(EmployeeDB).filter(
         EmployeeDB.id == employee_id
     ).first()
 
-    if not employee:
+    if employee is None:
         raise HTTPException(
             status_code=404,
             detail="Mitarbeiter nicht gefunden"
@@ -137,9 +142,8 @@ def add_employee(
     employee: Employee,
     db: Session = Depends(get_db)
 ):
-
     employee_db = EmployeeDB(
-        **employee.dict()
+        **employee.model_dump()
     )
 
     db.add(employee_db)
@@ -155,18 +159,17 @@ def update_employee(
     employee: Employee,
     db: Session = Depends(get_db)
 ):
-
     employee_db = db.query(EmployeeDB).filter(
         EmployeeDB.id == employee_id
     ).first()
 
-    if not employee_db:
+    if employee_db is None:
         raise HTTPException(
             status_code=404,
             detail="Mitarbeiter nicht gefunden"
         )
 
-    for key, value in employee.dict().items():
+    for key, value in employee.model_dump().items():
         setattr(employee_db, key, value)
 
     db.commit()
@@ -180,12 +183,11 @@ def delete_employee(
     employee_id: int,
     db: Session = Depends(get_db)
 ):
-
     employee_db = db.query(EmployeeDB).filter(
         EmployeeDB.id == employee_id
     ).first()
 
-    if not employee_db:
+    if employee_db is None:
         raise HTTPException(
             status_code=404,
             detail="Mitarbeiter nicht gefunden"
@@ -204,12 +206,10 @@ def delete_employee(
 
 @app.get("/stations")
 def get_stations():
-
     return [
         {
             "name": station,
-            "double_takt_allowed":
-                station in double_takt_stations
+            "double_takt_allowed": station in double_takt_stations
         }
         for station in stations
     ]
@@ -222,11 +222,10 @@ def get_stations():
 def run_rotation(
     db: Session = Depends(get_db)
 ):
-
     employees = db.query(EmployeeDB).all()
 
+    assigned = set()
     rotation_result = []
-    assigned_employees = set()
     support_employees = []
 
     sorted_employees = sorted(
@@ -236,18 +235,18 @@ def run_rotation(
 
     for station in stations:
 
-        assigned_employee = None
+        selected_employee = None
         skill_name = f"skill_{station}"
 
         for employee in sorted_employees:
+
+            if employee.id in assigned:
+                continue
 
             if employee.is_sick:
                 continue
 
             if employee.is_vacation:
-                continue
-
-            if employee.id in assigned_employees:
                 continue
 
             if employee.last_station == station:
@@ -260,53 +259,39 @@ def run_rotation(
             ):
                 continue
 
-            assigned_employee = (
-                f"{employee.firstname} "
-                f"{employee.lastname}"
-            )
+            selected_employee = employee
 
             employee.last_station = employee.station
             employee.station = station
             employee.fairness_points += 1
 
-            history = RotationHistory(
-                employee_name=assigned_employee,
-                station=station
+            db.add(
+                RotationHistory(
+                    employee_name=f"{employee.firstname} {employee.lastname}",
+                    station=station
+                )
             )
 
-            db.add(history)
-
-            assigned_employees.add(
-                employee.id
-            )
-
+            assigned.add(employee.id)
             break
 
         rotation_result.append({
             "name": station,
-            "employee_1": assigned_employee,
+            "employee_1":
+                None if selected_employee is None else
+                f"{selected_employee.firstname} {selected_employee.lastname}",
             "employee_2": None,
-            "support_required":
-                assigned_employee is None,
-            "double_takt_allowed":
-                station in double_takt_stations
+            "support_required": selected_employee is None,
+            "double_takt_allowed": station in double_takt_stations
         })
 
     for employee in employees:
 
-        if employee.is_sick:
-            continue
-
-        if employee.is_vacation:
-            continue
-
-        if employee.id not in assigned_employees:
-
+        if employee.id not in assigned and not employee.is_sick and not employee.is_vacation:
             employee.station = "Support"
 
             support_employees.append(
-                f"{employee.firstname} "
-                f"{employee.lastname}"
+                f"{employee.firstname} {employee.lastname}"
             )
 
     db.commit()
@@ -325,29 +310,15 @@ def run_rotation(
 def stats(
     db: Session = Depends(get_db)
 ):
-
     employees = db.query(EmployeeDB).all()
 
-    sick = sum(
-        1 for e in employees
-        if e.is_sick
-    )
-
-    vacation = sum(
-        1 for e in employees
-        if e.is_vacation
-    )
-
-    support = sum(
-        1 for e in employees
-        if e.station == "Support"
-    )
-
-    available = len(employees) - sick - vacation
+    sick = sum(1 for e in employees if e.is_sick)
+    vacation = sum(1 for e in employees if e.is_vacation)
+    support = sum(1 for e in employees if e.station == "Support")
 
     return {
         "employees_total": len(employees),
-        "available": available,
+        "available": len(employees) - sick - vacation,
         "vacation": vacation,
         "sick": sick,
         "support": support,
@@ -362,24 +333,21 @@ def stats(
 def fairness(
     db: Session = Depends(get_db)
 ):
-
     employees = db.query(EmployeeDB).all()
 
     return {
-        f"{e.firstname} {e.lastname}":
-        e.fairness_points
+        f"{e.firstname} {e.lastname}": e.fairness_points
         for e in employees
     }
 
 # ----------------------------------------------------
-# Historie
+# History
 # ----------------------------------------------------
 
 @app.get("/history")
 def history(
     db: Session = Depends(get_db)
 ):
-
     return db.query(
         RotationHistory
     ).order_by(
@@ -392,8 +360,7 @@ def history(
 
 @app.get("/flexibility")
 def flexibility():
-
     return {
         "double_takt_stations":
-            double_takt_stations
+            list(double_takt_stations)
     }
