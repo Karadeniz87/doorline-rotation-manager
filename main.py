@@ -61,7 +61,9 @@ seed_employees()
 # Stationen
 # --------------------------------------------------
 
-stations = [
+double_takt_mode = False
+
+normal_stations = [
     "30L", "30R",
     "40L", "40R",
     "50L", "50R",
@@ -73,13 +75,17 @@ stations = [
     "110L", "110R"
 ]
 
-double_takt_stations = [
-    "40L", "40R",
-    "50L", "50R",
-    "60L", "60R",
-    "70L", "70R"
+double_takt_layout = [
+    "30L", "30R",
+    "40L+50L",
+    "40R+50R",
+    "60L+70L",
+    "60R+70R",
+    "80L", "80R",
+    "90L", "90R",
+    "100L", "100R",
+    "110L", "110R"
 ]
-
 # --------------------------------------------------
 # Datenbank Session
 # --------------------------------------------------
@@ -104,6 +110,31 @@ def home():
 def health():
     return {
         "status": "running"
+    }
+
+
+# ----------------------------------------------------
+# Double Takt
+# ----------------------------------------------------
+
+double_takt_mode = False
+
+
+@app.get("/double-takt")
+def get_double_takt():
+    return {
+        "enabled": double_takt_mode
+    }
+
+
+@app.post("/double-takt/toggle")
+def toggle_double_takt():
+    global double_takt_mode
+
+    double_takt_mode = not double_takt_mode
+
+    return {
+        "enabled": double_takt_mode
     }
 
 # --------------------------------------------------
