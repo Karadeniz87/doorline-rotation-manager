@@ -260,16 +260,14 @@ def run_rotation(
 def run_rotation(
     db: Session = Depends(get_db)
 ):
-    employees = db.query(EmployeeDB).all()
-
-    active_employees = [
-        e for e in employees
-        if not e.is_sick and not e.is_vacation
-    ]
+    employee = db.query(EmployeeDB).first()
 
     return {
-        "employees_found": len(employees),
-        "active_employees": len(active_employees)
+        "name": employee.firstname,
+        "skill_40L": employee.skill_40L,
+        "skill_40R": employee.skill_40R,
+        "skill_50L": employee.skill_50L,
+        "skill_50R": employee.skill_50R
     }
 
 # --------------------------------------------------
