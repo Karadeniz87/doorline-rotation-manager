@@ -18,8 +18,8 @@ class EmployeeDB(Base):
     firstname = Column(String)
     lastname = Column(String)
     username = Column(String, unique=True, nullable=True)
-password = Column(String, nullable=True)
-role = Column(String, default="teamlead")
+    password = Column(String, nullable=True)
+    role = Column(String, default="teamlead")
 
     station = Column(String, nullable=True)
     last_station = Column(String, nullable=True)
