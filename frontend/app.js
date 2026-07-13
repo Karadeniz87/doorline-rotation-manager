@@ -49,30 +49,57 @@ async function loadStations() {
 
         if (!container) return;
 
-        container.innerHTML = "";
+        data.stations.forEach(station => {
 
-        stations.forEach(station => {
+    container.innerHTML += `
+        <div class="station-card">
 
-            container.innerHTML += `
-                <div class="station-card">
+            <h3>${station.name}</h3>
 
-                    <h3>${station.name}</h3>
+            <p>
+                👤 ${
+                    station.employee_1
+                    ? station.employee_1
+                    : "Nicht besetzt"
+                }
+            </p>
 
-                    <p>👤 Nicht besetzt</p>
+            ${
+                station.employee_2
+                ? `
+                <p>
+                    👤 ${station.employee_2}
+                </p>
+                `
+                : ""
+            }
 
-                    ${
-                        station.double_takt_allowed
-                        ? `
-                        <small>
-                            🔵 Doppeltakt möglich
-                        </small>
-                        `
-                        : ""
-                    }
+            ${
+                station.double_takt_allowed
+                ? `
+                <small>
+                    🔵 Doppeltakt möglich
+                </small>
+                `
+                : ""
+            }
 
-                </div>
-            `;
-        });
+            ${
+                station.support_required
+                ? `
+                <p style="
+                    color:red;
+                    font-weight:bold;
+                ">
+                    Support benötigt
+                </p>
+                `
+                : ""
+            }
+
+        </div>
+    `;
+});
 
     } catch (error) {
 
