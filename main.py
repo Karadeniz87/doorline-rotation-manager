@@ -239,6 +239,35 @@ def delete_employee(
     return {
         "message": "Mitarbeiter gelöscht"
     }
+    @app.post("/login")
+def login(
+    login_data: LoginRequest,
+    db: Session = Depends(get_db)
+):
+
+    user = db.query(EmployeeDB).filter(
+        EmployeeDB.username == login_data.username
+    ).first()
+
+    if user is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Benutzer nicht gefunden"
+        )
+
+    if user.password != login_data.password:
+        raise HTTPException(
+            status_code=401,
+            detail="Falsches Passwort"
+        )
+
+    return {
+        "id": user.id,
+        "username": user.username,
+        "role": user.role,
+        "firstname": user.firstname,
+        "lastname": user.lastname
+    }
 
 # --------------------------------------------------
 # Rotation
