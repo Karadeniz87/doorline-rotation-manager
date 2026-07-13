@@ -1,17 +1,14 @@
-const API_URL =
-    "https://doorline-rotation-manager.onrender.com";
-
 async function loadEmployees() {
 
     try {
 
-        const response =
-            await fetch(
-                `${API_URL}/employees`
-            );
+        const response = await fetch("/employees");
 
-        const employees =
-            await response.json();
+        if (!response.ok) {
+            throw new Error("Fehler beim Laden der Mitarbeiter");
+        }
+
+        const employees = await response.json();
 
         const container =
             document.getElementById(
@@ -20,8 +17,7 @@ async function loadEmployees() {
 
         container.innerHTML = "";
 
-        employees.forEach(
-            (employee) => {
+        employees.forEach((employee) => {
 
             container.innerHTML += `
                 <div class="card">
@@ -33,8 +29,122 @@ async function loadEmployees() {
 
                     <p>
                         📍 Station:
-                        ${
-                            employee.station ||
+                        ${employee.station || "Support"}
+                    </p>
+
+                    <p>
+                        ⚖️ Fairness:
+                        ${employee.fairness_points}
+                    </p>
+
+                    <label class="skill-item">
+                        <input
+                            type="checkbox"
+                            ${employee.is_sick ? "checked" : ""}
+                            onchange="
+                                updateEmployee(
+                                    ${employee.id},
+                                    'is_sick',
+                                    this.checked
+                                )
+                            "
+                        >
+                        🤒 Krank
+                    </label>
+
+                    <label class="skill-item">
+                        <input
+                            type="checkbox"
+                            ${employee.is_vacation ? "checked" : ""}
+                            onchange="
+                                updateEmployee(
+                                    ${employee.id},
+                                    'is_vacation',
+                                    this.checked
+                                )
+                            "
+                        >
+                        🏖 Urlaub
+                    </label>
+
+                </div>
+            `;
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        document.getElementById(
+            "employees_container"
+        ).innerHTML = `
+            <div class="card">
+                Fehler beim Laden der Mitarbeiter.
+            </div>
+        `;
+    }
+}
+
+async function updateEmployee(
+    employeeId,
+    field,
+    value
+) {
+
+    try {
+
+        const response =
+            await fetch(
+                `/employees/${employeeId}`
+            );
+
+        if (!response.ok) {
+            throw new Error(
+                "Mitarbeiter konnte nicht geladen werden"
+            );
+        }
+
+        const employee =
+            await response.json();
+
+        employee[field] = value;
+
+        const saveResponse =
+            await fetch(
+                `/employees/${employeeId}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body: JSON.stringify(
+                        employee
+                    )
+                }
+            );
+
+        if (!saveResponse.ok) {
+            throw new Error(
+                "Speichern fehlgeschlagen"
+            );
+        }
+
+        await loadEmployees();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Speichern fehlgeschlagen."
+        );
+    }
+}
+
+window.onload = function () {
+    loadEmployees();
+};                            employee.station ||
                             "Support"
                         }
                     </p>
