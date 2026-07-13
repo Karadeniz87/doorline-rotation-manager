@@ -266,17 +266,22 @@ def run_rotation(
     rotation_result = []
     support_employees = []
 
-    current_stations = (
-        double_takt_layout
-        if double_takt_mode
-        else normal_stations
-    )
-
     active_employees = [
-        e for e in employees
-        if not e.is_sick
-        and not e.is_vacation
-    ]
+    e for e in employees
+    if not e.is_sick
+    and not e.is_vacation
+]
+
+available_count = len(active_employees)
+
+# Automatischer Double-Takt bei Unterbesetzung
+auto_double_takt = available_count < 15
+
+current_stations = (
+    double_takt_layout
+    if auto_double_takt or double_takt_mode
+    else normal_stations
+)
 
     active_employees.sort(
         key=lambda x: x.fairness_points
@@ -355,11 +360,12 @@ def run_rotation(
     db.commit()
 
     return {
-        "message": "Rotation durchgeführt",
-        "double_takt_mode": double_takt_mode,
-        "stations": rotation_result,
-        "support_employees": support_employees
-    }
+    "message": "Rotation durchgeführt",
+    "double_takt_mode": auto_double_takt or double_takt_mode,
+    "available_employees": available_count,
+    "stations": rotation_result,
+    "support_employees": support_employees
+}
 # --------------------------------------------------
 # KPI
 # --------------------------------------------------
