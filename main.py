@@ -291,35 +291,6 @@ for station in current_stations:
 
     skill_name = f"skill_{station_name}"
 
-for employee in active_employees:
-
-    if employee.id in assigned_ids:
-        continue
-
-    if getattr(employee, skill_name, False):
-        selected_employee = employee
-        break
-
-        if selected_employee:
-
-            assigned_ids.add(selected_employee.id)
-
-            selected_employee.station = station
-            selected_employee.fairness_points += 1
-
-            rotation_result.append({
-                "station": station,
-                "employee":
-                    f"{selected_employee.firstname} "
-                    f"{selected_employee.lastname}"
-            })
-
-        else:
-            rotation_result.append({
-                "station": station,
-                "employee": None
-            })
-
     for employee in active_employees:
         if employee.id not in assigned_ids:
             employee.station = "Support"
