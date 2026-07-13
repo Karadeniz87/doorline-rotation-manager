@@ -260,7 +260,6 @@ def run_rotation(
     double_takt_mode: bool = False,
     db: Session = Depends(get_db)
 ):
-
     employees = db.query(EmployeeDB).all()
 
     assigned_ids = set()
@@ -269,13 +268,11 @@ def run_rotation(
 
     active_employees = [
         e for e in employees
-        if not e.is_sick
-        and not e.is_vacation
+        if not e.is_sick and not e.is_vacation
     ]
 
     available_count = len(active_employees)
 
-    # Automatischer Double-Takt
     auto_double_takt = available_count < 15
 
     current_stations = (
@@ -284,7 +281,6 @@ def run_rotation(
         else normal_stations
     )
 
-    # Nach Fairness sortieren
     active_employees.sort(
         key=lambda x: x.fairness_points
     )
@@ -294,7 +290,6 @@ def run_rotation(
         selected_employee = None
 
         for employee in active_employees:
-
             if employee.id in assigned_ids:
                 continue
 
@@ -310,26 +305,24 @@ def run_rotation(
 
             rotation_result.append({
                 "station": station,
-                "employee": (
+                "employee":
                     f"{selected_employee.firstname} "
                     f"{selected_employee.lastname}"
-                )
             })
 
         else:
-
             rotation_result.append({
                 "station": station,
                 "employee": None
             })
 
-    # übrige Mitarbeiter = Support
     for employee in active_employees:
-
         if employee.id not in assigned_ids:
             employee.station = "Support"
+
             support_employees.append(
-                f"{employee.firstname} {employee.lastname}"
+                f"{employee.firstname} "
+                f"{employee.lastname}"
             )
 
     db.commit()
