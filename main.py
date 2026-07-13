@@ -239,7 +239,9 @@ def delete_employee(
     return {
         "message": "Mitarbeiter gelöscht"
     }
-    @app.post("/login")
+
+
+@app.post("/login")
 def login(
     login_data: LoginRequest,
     db: Session = Depends(get_db)
