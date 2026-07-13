@@ -257,6 +257,7 @@ double_takt_stations = {
 
 @app.post("/rotation/run")
 def run_rotation(
+    double_takt_mode: bool = False,
     db: Session = Depends(get_db)
 ):
 
@@ -266,7 +267,7 @@ def run_rotation(
     rotation_result = []
     support_employees = []
 
-        active_employees = [
+    active_employees = [
         e for e in employees
         if not e.is_sick
         and not e.is_vacation
@@ -274,7 +275,7 @@ def run_rotation(
 
     available_count = len(active_employees)
 
-    # Automatischer Double-Takt bei Unterbesetzung
+    # Automatischer Double-Takt
     auto_double_takt = available_count < 15
 
     current_stations = (
@@ -283,76 +284,50 @@ def run_rotation(
         else normal_stations
     )
 
-active_employees.sort(
-    key=lambda x: x.fairness_points
+    # Nach Fairness sortieren
+    active_employees.sort(
+        key=lambda x: x.fairness_points
     )
 
     for station in current_stations:
 
         selected_employee = None
 
-        # Skillname bestimmen
-        if "+" in station:
-            base_station = station.split("+")[0]
-            skill_name = f"skill_{base_station}"
-        else:
-            skill_name = f"skill_{station}"
-
         for employee in active_employees:
 
             if employee.id in assigned_ids:
                 continue
 
-            if hasattr(employee, skill_name):
-                if not getattr(employee, skill_name):
-                    continue
-
             selected_employee = employee
-
-            assigned_ids.add(employee.id)
-
-            employee.last_station = employee.station
-            employee.station = station
-            employee.fairness_points += 1
-
-            db.add(
-                RotationHistory(
-                    employee_name=f"{employee.firstname} {employee.lastname}",
-                    station=station
-                )
-            )
-
             break
 
-        rotation_result.append(
-            {
-                "name": station,
+        if selected_employee:
 
-                "employee_1":
-                    f"{selected_employee.firstname} {selected_employee.lastname}"
-                    if selected_employee else None,
+            assigned_ids.add(selected_employee.id)
 
-                "employee_2": None,
+            selected_employee.station = station
+            selected_employee.fairness_points += 1
 
-                "support_required":
-                    selected_employee is None,
+            rotation_result.append({
+                "station": station,
+                "employee": (
+                    f"{selected_employee.firstname} "
+                    f"{selected_employee.lastname}"
+                )
+            })
 
-                "double_takt_allowed":
-                    (
-                        "40" in station
-                        or "50" in station
-                        or "60" in station
-                        or "70" in station
-                    )
-            }
-        )
+        else:
 
+            rotation_result.append({
+                "station": station,
+                "employee": None
+            })
+
+    # übrige Mitarbeiter = Support
     for employee in active_employees:
 
         if employee.id not in assigned_ids:
-
             employee.station = "Support"
-
             support_employees.append(
                 f"{employee.firstname} {employee.lastname}"
             )
@@ -360,12 +335,12 @@ active_employees.sort(
     db.commit()
 
     return {
-    "message": "Rotation durchgeführt",
-    "double_takt_mode": auto_double_takt or double_takt_mode,
-    "available_employees": available_count,
-    "stations": rotation_result,
-    "support_employees": support_employees
-}
+        "message": "Rotation durchgeführt",
+        "double_takt_mode": auto_double_takt,
+        "available_employees": available_count,
+        "stations": rotation_result,
+        "support_employees": support_employees
+    }
 # --------------------------------------------------
 # KPI
 # --------------------------------------------------
