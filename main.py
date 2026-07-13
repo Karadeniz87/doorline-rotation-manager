@@ -287,80 +287,80 @@ def run_rotation(
 
     for station in current_stations:
 
-        selected_employee = None
-
-                for employee in active_employees:
-
-            if employee.id in assigned_ids:
-                continue
-
-            # -----------------------
-            # Doppeltakt Stationen
-            # -----------------------
-            if "+" in station:
-
-                station_a, station_b = station.split("+")
-
-                skill_a = f"skill_{station_a}"
-                skill_b = f"skill_{station_b}"
-
-                if (
-                    getattr(employee, skill_a, False)
-                    or getattr(employee, skill_b, False)
-                ):
-                    selected_employee = employee
-                    break
-
-            # -----------------------
-            # Normale Stationen
-            # -----------------------
-            else:
-
-                skill_name = f"skill_{station}"
-
-                if getattr(employee, skill_name, False):
-                    selected_employee = employee
-                    break
-
-        if selected_employee:
-
-            assigned_ids.add(selected_employee.id)
-
-            selected_employee.station = station
-            selected_employee.fairness_points += 1
-
-            rotation_result.append({
-                "station": station,
-                "employee":
-                    f"{selected_employee.firstname} "
-                    f"{selected_employee.lastname}"
-            })
-
-        else:
-
-            rotation_result.append({
-                "station": station,
-                "employee": None
-            })
+    selected_employee = None
 
     for employee in active_employees:
-        if employee.id not in assigned_ids:
-            employee.station = "Support"
 
-            support_employees.append(
-                f"{employee.firstname} "
-                f"{employee.lastname}"
-            )
+        if employee.id in assigned_ids:
+            continue
 
-    db.commit()
+        # -----------------------
+        # Doppeltakt Stationen
+        # -----------------------
+        if "+" in station:
 
-    return {
-        "message": "Rotation durchgeführt",
-        "double_takt_mode": auto_double_takt,
-        "available_employees": available_count,
-        "stations": rotation_result,
-        "support_employees": support_employees
-    }
+            station_a, station_b = station.split("+")
+
+            skill_a = f"skill_{station_a}"
+            skill_b = f"skill_{station_b}"
+
+            if (
+                getattr(employee, skill_a, False)
+                or getattr(employee, skill_b, False)
+            ):
+                selected_employee = employee
+                break
+
+        # -----------------------
+        # Normale Stationen
+        # -----------------------
+        else:
+
+            skill_name = f"skill_{station}"
+
+            if getattr(employee, skill_name, False):
+                selected_employee = employee
+                break
+
+    if selected_employee:
+
+        assigned_ids.add(selected_employee.id)
+
+        selected_employee.station = station
+        selected_employee.fairness_points += 1
+
+        rotation_result.append({
+            "station": station,
+            "employee":
+                f"{selected_employee.firstname} "
+                f"{selected_employee.lastname}"
+        })
+
+    else:
+
+        rotation_result.append({
+            "station": station,
+            "employee": None
+        })
+
+for employee in active_employees:
+    if employee.id not in assigned_ids:
+        employee.station = "Support"
+
+        support_employees.append(
+            f"{employee.firstname} "
+            f"{employee.lastname}"
+        )
+
+db.commit()
+
+return {
+    "message": "Rotation durchgeführt",
+    "double_takt_mode": auto_double_takt,
+    "available_employees": available_count,
+    "stations": rotation_result,
+    "support_employees": support_employees
+}
 # --------------------------------------------------
 # KPI
 # --------------------------------------------------
