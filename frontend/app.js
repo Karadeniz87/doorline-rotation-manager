@@ -138,25 +138,15 @@ async function runRotation() {
             container.innerHTML += `
                 <div class="station-card">
 
-                    <h3>${station.name}</h3>
+                    <h3>${station.station}</h3>
 
-                    <p>
-                        👤 ${
-                            station.employee_1
-                            ? station.employee_1
-                            : "Nicht besetzt"
-                        }
-                    </p>
-
-                    ${
-                        station.employee_2
-                        ? `
-                        <p>
-                            👤 ${station.employee_2}
-                        </p>
-                        `
-                        : ""
-                    }
+<p>
+    👤 ${
+        station.employee
+            ? station.employee
+            : "Nicht besetzt"
+    }
+</p>
 
                     ${
                         station.double_takt_allowed
