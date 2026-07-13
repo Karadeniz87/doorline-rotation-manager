@@ -289,16 +289,38 @@ def run_rotation(
 
         selected_employee = None
 
-        skill_name = f"skill_{station}"
-
-        for employee in active_employees:
+                for employee in active_employees:
 
             if employee.id in assigned_ids:
                 continue
 
-            if getattr(employee, skill_name, False):
-                selected_employee = employee
-                break
+            # -----------------------
+            # Doppeltakt Stationen
+            # -----------------------
+            if "+" in station:
+
+                station_a, station_b = station.split("+")
+
+                skill_a = f"skill_{station_a}"
+                skill_b = f"skill_{station_b}"
+
+                if (
+                    getattr(employee, skill_a, False)
+                    or getattr(employee, skill_b, False)
+                ):
+                    selected_employee = employee
+                    break
+
+            # -----------------------
+            # Normale Stationen
+            # -----------------------
+            else:
+
+                skill_name = f"skill_{station}"
+
+                if getattr(employee, skill_name, False):
+                    selected_employee = employee
+                    break
 
         if selected_employee:
 
