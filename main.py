@@ -285,41 +285,41 @@ def run_rotation(
         key=lambda x: x.fairness_points
     )
 
-for station in current_stations:
+    for station in current_stations:
 
-    selected_employee = None
+        selected_employee = None
 
-    skill_name = f"skill_{station}"
+        skill_name = f"skill_{station}"
 
-    for employee in active_employees:
+        for employee in active_employees:
 
-        if employee.id in assigned_ids:
-            continue
+            if employee.id in assigned_ids:
+                continue
 
-        if getattr(employee, skill_name, False):
-            selected_employee = employee
-            break
+            if getattr(employee, skill_name, False):
+                selected_employee = employee
+                break
 
-    if selected_employee:
+        if selected_employee:
 
-        assigned_ids.add(selected_employee.id)
+            assigned_ids.add(selected_employee.id)
 
-        selected_employee.station = station
-        selected_employee.fairness_points += 1
+            selected_employee.station = station
+            selected_employee.fairness_points += 1
 
-        rotation_result.append({
-            "station": station,
-            "employee":
-                f"{selected_employee.firstname} "
-                f"{selected_employee.lastname}"
-        })
+            rotation_result.append({
+                "station": station,
+                "employee":
+                    f"{selected_employee.firstname} "
+                    f"{selected_employee.lastname}"
+            })
 
-    else:
+        else:
 
-        rotation_result.append({
-            "station": station,
-            "employee": None
-        })
+            rotation_result.append({
+                "station": station,
+                "employee": None
+            })
 
 
 for employee in active_employees:
