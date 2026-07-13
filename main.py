@@ -285,7 +285,7 @@ def run_rotation(
         key=lambda x: x.fairness_points
     )
 
-    for station in current_stations:
+for station in current_stations:
 
     selected_employee = None
 
