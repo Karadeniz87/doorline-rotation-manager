@@ -125,6 +125,25 @@ async function runRotation() {
 
         const data =
             await response.json();
+        const statusElement =
+    document.getElementById(
+        "staffing_status"
+    );
+
+if (data.staffing_status === "green") {
+    statusElement.innerHTML =
+        "🟢 Voll besetzt";
+}
+
+else if (data.staffing_status === "yellow") {
+    statusElement.innerHTML =
+        "🟡 Support benötigt";
+}
+
+else {
+    statusElement.innerHTML =
+        "🔴 Unterbesetzt";
+}
 
         const container =
             document.getElementById(
