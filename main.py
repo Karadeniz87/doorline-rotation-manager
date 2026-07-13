@@ -309,12 +309,6 @@ def run_rotation(
         "stations": rotation_result,
         "support_employees": support_employees
     }
-    "message": "Rotation durchgeführt",
-    "double_takt_mode": auto_double_takt,
-    "available_employees": available_count,
-    "stations": rotation_result,
-    "support_employees": support_employees
-}
 # --------------------------------------------------
 # KPI
 # --------------------------------------------------
