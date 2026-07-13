@@ -266,22 +266,22 @@ def run_rotation(
     rotation_result = []
     support_employees = []
 
-    active_employees = [
-    e for e in employees
-    if not e.is_sick
-    and not e.is_vacation
-]
+        active_employees = [
+        e for e in employees
+        if not e.is_sick
+        and not e.is_vacation
+    ]
 
-available_count = len(active_employees)
+    available_count = len(active_employees)
 
-# Automatischer Double-Takt bei Unterbesetzung
-auto_double_takt = available_count < 15
+    # Automatischer Double-Takt bei Unterbesetzung
+    auto_double_takt = available_count < 15
 
-current_stations = (
-    double_takt_layout
-    if auto_double_takt or double_takt_mode
-    else normal_stations
-)
+    current_stations = (
+        double_takt_layout
+        if auto_double_takt or double_takt_mode
+        else normal_stations
+    )
 
     active_employees.sort(
         key=lambda x: x.fairness_points
