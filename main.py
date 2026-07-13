@@ -291,51 +291,24 @@ def run_rotation(
 
         skill_name = f"skill_{station}"
 
-        for employee in active_employees:
+            for employee in active_employees:
+        if employee.id not in assigned_ids:
+            employee.station = "Support"
 
-            if employee.id in assigned_ids:
-                continue
+            support_employees.append(
+                f"{employee.firstname} "
+                f"{employee.lastname}"
+            )
 
-            if getattr(employee, skill_name, False):
-                selected_employee = employee
-                break
+    db.commit()
 
-        if selected_employee:
-
-            assigned_ids.add(selected_employee.id)
-
-            selected_employee.station = station
-            selected_employee.fairness_points += 1
-
-            rotation_result.append({
-                "station": station,
-                "employee":
-                    f"{selected_employee.firstname} "
-                    f"{selected_employee.lastname}"
-            })
-
-        else:
-
-            rotation_result.append({
-                "station": station,
-                "employee": None
-            })
-
-
-for employee in active_employees:
-
-    if employee.id not in assigned_ids:
-
-        employee.station = "Support"
-
-        support_employees.append(
-            f"{employee.firstname} "
-            f"{employee.lastname}"
-        )
-
-db.commit()
-
-return {
+    return {
+        "message": "Rotation durchgeführt",
+        "double_takt_mode": auto_double_takt,
+        "available_employees": available_count,
+        "stations": rotation_result,
+        "support_employees": support_employees
+    }
     "message": "Rotation durchgeführt",
     "double_takt_mode": auto_double_takt,
     "available_employees": available_count,
