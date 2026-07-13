@@ -1,40 +1,112 @@
 async function loadEmployees() {
 
-    try {
+    const response = await fetch("/employees");
+    const employees = await response.json();
 
-        const response = await fetch("/employees");
+    const container =
+        document.getElementById(
+            "employees_container"
+        );
 
-        if (!response.ok) {
-            throw new Error("Fehler beim Laden der Mitarbeiter");
+    container.innerHTML = "";
+
+    employees.forEach((employee) => {
+
+        container.innerHTML += `
+            <div class="card">
+
+                <h2>
+                    ${employee.firstname}
+                    ${employee.lastname}
+                </h2>
+
+                <p>
+                    📍 Station:
+                    ${employee.station || "Support"}
+                </p>
+
+                <p>
+                    ⚖️ Fairness:
+                    ${employee.fairness_points || 0}
+                </p>
+
+                <label class="skill-item">
+
+                    <input
+                        type="checkbox"
+                        ${employee.is_sick ? "checked" : ""}
+                        onchange="
+                            updateEmployee(
+                                ${employee.id},
+                                'is_sick',
+                                this.checked
+                            )
+                        "
+                    >
+
+                    🤒 Krank
+
+                </label>
+
+                <label class="skill-item">
+
+                    <input
+                        type="checkbox"
+                        ${employee.is_vacation ? "checked" : ""}
+                        onchange="
+                            updateEmployee(
+                                ${employee.id},
+                                'is_vacation',
+                                this.checked
+                            )
+                        "
+                    >
+
+                    🏖 Urlaub
+
+                </label>
+
+            </div>
+        `;
+    });
+}
+
+async function updateEmployee(
+    employeeId,
+    field,
+    value
+) {
+
+    const response =
+        await fetch(
+            `/employees/${employeeId}`
+        );
+
+    const employee =
+        await response.json();
+
+    employee[field] = value;
+
+    await fetch(
+        `/employees/${employeeId}`,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type":
+                    "application/json"
+            },
+            body: JSON.stringify(
+                employee
+            )
         }
+    );
 
-        const employees = await response.json();
+    loadEmployees();
+}
 
-        const container =
-            document.getElementById(
-                "employees_container"
-            );
-
-        container.innerHTML = "";
-
-        employees.forEach((employee) => {
-
-            container.innerHTML += `
-                <div class="card">
-
-                    <h2>
-                        ${employee.firstname}
-                        ${employee.lastname}
-                    </h2>
-
-                    <p>
-                        📍 Station:
-                        ${employee.station || "Support"}
-                    </p>
-
-                    <p>
-                        ⚖️ Fairness:
-                        ${employee.fairness_points}
+window.onload = function () {
+    loadEmployees();
+};                        ${employee.fairness_points}
                     </p>
 
                     <label class="skill-item">
