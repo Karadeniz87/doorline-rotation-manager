@@ -304,7 +304,7 @@ def run_rotation(
 
                 if (
                     getattr(employee, skill_a, False)
-                    or getattr(employee, skill_b, False)
+                    and getattr(employee, skill_b, False)
                 ):
                     selected_employee = employee
                     break
