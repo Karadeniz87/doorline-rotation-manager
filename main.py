@@ -289,12 +289,16 @@ def run_rotation(
 
         selected_employee = None
 
-        for employee in active_employees:
-            if employee.id in assigned_ids:
-                continue
+        skill_name = f"skill_{station_name}"
 
-            selected_employee = employee
-            break
+for employee in active_employees:
+
+    if employee.id in assigned_ids:
+        continue
+
+    if getattr(employee, skill_name, False):
+        selected_employee = employee
+        break
 
         if selected_employee:
 
