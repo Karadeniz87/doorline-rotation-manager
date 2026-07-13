@@ -316,33 +316,37 @@ def run_rotation(
                 if getattr(employee, skill_name, False):
                     selected_employee = employee
                     break
-
         if selected_employee:
 
             assigned_ids.add(selected_employee.id)
 
             selected_employee.station = station
+
+            # -----------------------
+            # Fairness Gewichtung
+            # -----------------------
             weight = 1
 
-if "60" in station:
-    weight = 2
+            if "60" in station:
+                weight = 2
 
-if "70" in station:
-    weight = 2
+            if "70" in station:
+                weight = 2
 
-if "80" in station:
-    weight = 3
+            if "80" in station:
+                weight = 3
 
-if "90" in station:
-    weight = 2
+            if "90" in station:
+                weight = 2
 
-if "100" in station:
-    weight = 2
+            if "100" in station:
+                weight = 2
 
-if "+" in station:
-    weight += 2
+            # Doppeltakt bekommt zusätzliche Punkte
+            if "+" in station:
+                weight += 2
 
-selected_employee.fairness_points += weight
+            selected_employee.fairness_points += weight
 
             rotation_result.append({
                 "station": station,
@@ -358,14 +362,36 @@ selected_employee.fairness_points += weight
                 "employee": None
             })
 
+    # ------------------------------------
+    # Nicht eingeplante Mitarbeiter
+    # ------------------------------------
     for employee in active_employees:
+
         if employee.id not in assigned_ids:
+
             employee.station = "Support"
 
             support_employees.append(
                 f"{employee.firstname} "
                 f"{employee.lastname}"
             )
+
+    # ------------------------------------
+    # Besetzungsampel
+    # ------------------------------------
+    unassigned = sum(
+        1 for s in rotation_result
+        if s["employee"] is None
+    )
+
+    if unassigned == 0:
+        staffing_status = "green"
+
+    elif unassigned <= 2:
+        staffing_status = "yellow"
+
+    else:
+        staffing_status = "red"
 
     db.commit()
 
@@ -374,7 +400,8 @@ selected_employee.fairness_points += weight
         "double_takt_mode": auto_double_takt,
         "available_employees": available_count,
         "stations": rotation_result,
-        "support_employees": support_employees
+        "support_employees": support_employees,
+        "staffing_status": staffing_status
     }
 # --------------------------------------------------
 # KPI
