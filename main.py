@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
+from schemas import LoginRequest
 
 from database import SessionLocal, engine, Base
 from models import EmployeeDB, RotationHistory
