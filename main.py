@@ -283,8 +283,8 @@ def run_rotation(
         else normal_stations
     )
 
-    active_employees.sort(
-        key=lambda x: x.fairness_points
+active_employees.sort(
+    key=lambda x: x.fairness_points
     )
 
     for station in current_stations:
