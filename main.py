@@ -322,7 +322,27 @@ def run_rotation(
             assigned_ids.add(selected_employee.id)
 
             selected_employee.station = station
-            selected_employee.fairness_points += 1
+            weight = 1
+
+if "60" in station:
+    weight = 2
+
+if "70" in station:
+    weight = 2
+
+if "80" in station:
+    weight = 3
+
+if "90" in station:
+    weight = 2
+
+if "100" in station:
+    weight = 2
+
+if "+" in station:
+    weight += 2
+
+selected_employee.fairness_points += weight
 
             rotation_result.append({
                 "station": station,
