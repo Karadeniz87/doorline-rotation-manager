@@ -251,6 +251,23 @@ def delete_employee(
     return {
         "message": "Mitarbeiter gelöscht"
     }
+# --------------------------------------------------
+# Mitarbeiter zurücksetzen
+# --------------------------------------------------
+
+@app.get("/employees/reset")
+def reset_employees(
+    db: Session = Depends(get_db)
+):
+
+    db.query(EmployeeDB).delete()
+    db.commit()
+
+    seed_employees()
+
+    return {
+        "message": "Mitarbeiter erfolgreich zurückgesetzt"
+    }
 
 
 # --------------------------------------------------
