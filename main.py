@@ -49,7 +49,7 @@ EmployeeDB(
     username="tlsp",
     password="tesla",
     role="teamlead_sp"
-)
+),
 
             EmployeeDB(firstname="Christian", lastname="Francke"),
             EmployeeDB(firstname="Cagliyan", lastname="Aslandag"),
