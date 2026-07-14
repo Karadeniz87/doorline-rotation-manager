@@ -27,17 +27,24 @@ def seed_employees():
 
     db = SessionLocal()
 
-    if db.query(EmployeeDB).count() == 0:
+admin = db.query(EmployeeDB).filter(
+    EmployeeDB.username == "admin"
+).first()
 
-        employees = [
+if admin is None:
 
-            EmployeeDB(
-                firstname="Onur",
-                lastname="Yilmaz",
-                username="admin",
-                password="1234",
-                role="admin"
-            ),
+    admin_user = EmployeeDB(
+        firstname="Onur",
+        lastname="Yilmaz",
+        username="admin",
+        password="1234",
+        role="admin"
+    )
+
+    db.add(admin_user)
+    db.commit()
+
+db.close()
 
             EmployeeDB(firstname="Christian", lastname="Francke"),
             EmployeeDB(firstname="Cagliyan", lastname="Aslandag"),
