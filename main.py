@@ -255,7 +255,7 @@ def delete_employee(
 # Mitarbeiter zurücksetzen
 # --------------------------------------------------
 
-@app.get("/employees/reset")
+@app.get("/reset-employees")
 def reset_employees(
     db: Session = Depends(get_db)
 ):
