@@ -407,4 +407,16 @@ window.onload = function () {
     loadFairness();
 
     loadHistory();
+
+    const role = localStorage.getItem("role");
+
+    if (role === "teamlead_sp") {
+
+        document.querySelectorAll(".admin-only")
+            .forEach(element => {
+                element.style.display = "none";
+            });
+
+    }
+
 };
