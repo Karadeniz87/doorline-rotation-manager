@@ -274,19 +274,20 @@ def reset_employees(
 # Doppelte Mitarbeiter löschen
 # --------------------------------------------------
 
-@app.get("/employees/remove-duplicates")
+@app.get("/remove-duplicates")
 def remove_duplicates(
     db: Session = Depends(get_db)
 ):
-
     employees = db.query(EmployeeDB).all()
 
     seen = set()
     deleted = 0
 
     for employee in employees:
-
-        key = f"{employee.firstname}_{employee.lastname}"
+        key = (
+            employee.firstname.strip().lower(),
+            employee.lastname.strip().lower()
+        )
 
         if key in seen:
             db.delete(employee)
