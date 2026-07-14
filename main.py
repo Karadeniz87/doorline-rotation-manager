@@ -36,12 +36,20 @@ def seed_employees():
         employees = [
 
             EmployeeDB(
-                firstname="Onur",
-                lastname="Yilmaz",
-                username="admin",
-                password="1234",
-                role="admin"
-            ),
+    firstname="Onur",
+    lastname="Yilmaz",
+    username="admin",
+    password="141187",
+    role="admin"
+)
+
+EmployeeDB(
+    firstname="TL",
+    lastname="SP",
+    username="tlsp",
+    password="tesla",
+    role="teamlead_sp"
+)
 
             EmployeeDB(firstname="Christian", lastname="Francke"),
             EmployeeDB(firstname="Cagliyan", lastname="Aslandag"),
