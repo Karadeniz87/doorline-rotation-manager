@@ -41,7 +41,7 @@ def seed_employees():
     username="admin",
     password="141187",
     role="admin"
-)
+),
 
 EmployeeDB(
     firstname="TL",
