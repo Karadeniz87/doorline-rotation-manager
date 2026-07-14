@@ -1,40 +1,4 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-body{
-    font-family:Arial, sans-serif;
-    background:#111827;
-    color:white;
-    padding:15px;
-}
-
-.container{
-    max-width:1200px;
-    margin:auto;
-}
-
-.header{
-    text-align:center;
-    margin-bottom:20px;
-}
-
-.header h1{
-    font-size:30px;
-    margin-bottom:10px;
-}
-
-.header p{
-    color:#9ca3af;
-}
-
-.cards{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-    gap:15px;
-    margin-bottom:20px;
+JPH und KPI Dashboard    margin-bottom:20px;
 }
 
 .card{
