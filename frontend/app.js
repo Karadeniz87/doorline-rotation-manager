@@ -32,74 +32,68 @@ async function loadStats() {
 }
 
 
-async function loadStations() {
+async function loadStations(){
 
-    try {
+    const response =
+        await fetch("/stations");
 
-        const response =
-            await fetch("/stations");
+    const stations =
+        await response.json();
 
-        const stations =
-            await response.json();
+    const container =
+        document.getElementById(
+            "stations_container"
+        );
 
-        const container =
-            document.getElementById(
-                "stations_container"
-            );
+    container.innerHTML = "";
 
-        if (!container) return;
+    for(let i=0;i<stations.length;i+=2){
 
-        data.stations.forEach(station => {
+        const left = stations[i];
+        const right = stations[i+1];
 
-    container.innerHTML += `
-        <div class="station-card">
+        let statusClass = "green-status";
 
-            <h3>${station.name}</h3>
+        if(
+            !left.employee &&
+            !right.employee
+        ){
+            statusClass = "red-status";
+        }
 
-            <p>
-                👤 ${
-                    station.employee_1
-                    ? station.employee_1
-                    : "Nicht besetzt"
-                }
-            </p>
+        container.innerHTML += `
+        <div class="station-row">
 
-            ${
-                station.employee_2
-                ? `
+            <div class="station-left">
+                <h3>${left.station}</h3>
                 <p>
-                    👤 ${station.employee_2}
+                    ${
+                        left.employee
+                        || "Nicht besetzt"
+                    }
                 </p>
-                `
-                : ""
-            }
+            </div>
 
-            ${
-                station.double_takt_allowed
-                ? `
-                <small>
-                    🔵 Doppeltakt möglich
-                </small>
-                `
-                : ""
-            }
+            <div class="
+                status-circle
+                ${statusClass}
+            ">
+            </div>
 
-            ${
-                station.support_required
-                ? `
-                <p style="
-                    color:red;
-                    font-weight:bold;
-                ">
-                    Support benötigt
+            <div class="station-right">
+                <h3>${right.station}</h3>
+                <p>
+                    ${
+                        right.employee
+                        || "Nicht besetzt"
+                    }
                 </p>
-                `
-                : ""
-            }
+            </div>
 
         </div>
-    `;
-});
+        `;
+    }
+}
 
     } catch (error) {
 
