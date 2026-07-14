@@ -24,18 +24,19 @@ app.mount(
 # Mitarbeiter automatisch anlegen
 # --------------------------------------------------
 
-def seed_employees():
+employees = [
+    EmployeeDB(
+        firstname="Onur",
+        lastname="Yilmaz",
+        username="admin",
+        password="1234",
+        role="admin"
+    ),
 
-    db = SessionLocal()
-
-    if db.query(EmployeeDB).count() == 0:
-
-        employees = [
-            EmployeeDB(firstname="Waldemar", lastname="Krupowicz"),
-            EmployeeDB(firstname="Christian", lastname="Francke"),
-            EmployeeDB(firstname="Cagliyan", lastname="Aslandag"),
-            EmployeeDB(firstname="Mhd Nour", lastname="Fallah"),
-            EmployeeDB(firstname="Oliwia", lastname="Budkowska"),
+    EmployeeDB(firstname="Christian", lastname="Francke"),
+    EmployeeDB(firstname="Cagliyan", lastname="Aslandag"),
+    EmployeeDB(firstname="Mhd Nour", lastname="Fallah"),
+    EmployeeDB(firstname="Oliwia", lastname="Budkowska"),
             EmployeeDB(firstname="Maxwell Kofi", lastname="Mensah"),
             EmployeeDB(firstname="Adolphe Boumsong", lastname="Dimouk"),
             EmployeeDB(firstname="Fabian", lastname="Dubaj"),
