@@ -1,40 +1,110 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doorline Login</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
+<title>Doorline Login</title>
 
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-            font-family:Arial, sans-serif;
-        }
+<style>
 
-        body{
-            background:#111827;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            height:100vh;
-        }
+body{
+    margin:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    background:#111827;
+    font-family:Arial;
+}
 
-        .login-box{
-            width:400px;
-            background:#1f2937;
-            padding:40px;
-            border-radius:20px;
-            box-shadow:0 0 30px rgba(0,0,0,0.4);
-        }
+.login-box{
+    width:380px;
+    padding:40px;
+    background:#1f2937;
+    border-radius:20px;
+}
 
-        h1{
-            color:white;
-            text-align:center;
-            margin-bottom:30px;
-        }
+h1{
+    color:white;
+    text-align:center;
+    margin-bottom:30px;
+}
+
+input{
+    width:100%;
+    padding:15px;
+    margin-bottom:20px;
+    border:none;
+    border-radius:10px;
+}
+
+button{
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:10px;
+    background:#2563eb;
+    color:white;
+    font-size:18px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="login-box">
+
+<h1>Doorline Login</h1>
+
+<input
+    id="username"
+    placeholder="Benutzername"
+>
+
+<input
+    id="password"
+    type="password"
+    placeholder="Passwort"
+>
+
+<button onclick="login()">
+    Login
+</button>
+
+</div>
+
+<script>
+
+async function login(){
+
+    const response = await fetch("/login",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            username:document.getElementById("username").value,
+            password:document.getElementById("password").value
+        })
+    });
+
+    const data = await response.json();
+
+    if(response.ok){
+        window.location.href="/";
+    }else{
+        alert(data.detail);
+    }
+}
+
+</script>
+
+</body>
+</html>        }
 
         input{
             width:100%;
