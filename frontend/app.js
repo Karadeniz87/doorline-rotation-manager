@@ -420,3 +420,19 @@ window.onload = function () {
     }
 
 };
+// ----------------------------
+// Rollenprüfung TL SP
+// ----------------------------
+
+const role = localStorage.getItem("role");
+
+if (role === "teamlead_sp") {
+
+    const skillButton =
+        document.getElementById("skill_button");
+
+    if (skillButton) {
+        skillButton.style.display = "none";
+    }
+
+}
