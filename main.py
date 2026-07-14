@@ -225,34 +225,6 @@ def add_employee(
     employee_data: dict,
     db: Session = Depends(get_db)
 ):
-@app.get("/create-tlsp")
-def create_tlsp(
-    db: Session = Depends(get_db)
-):
-
-    existing = db.query(EmployeeDB).filter(
-        EmployeeDB.username == "tlsp"
-    ).first()
-
-    if existing:
-        return {
-            "message": "TLSP existiert bereits"
-        }
-
-    user = EmployeeDB(
-        firstname="TL",
-        lastname="SP",
-        username="tlsp",
-        password="1234",
-        role="teamlead_sp"
-    )
-
-    db.add(user)
-    db.commit()
-
-    return {
-        "message": "TLSP erstellt"
-    }
 
     employee = EmployeeDB(
         **employee_data
