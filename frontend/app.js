@@ -410,14 +410,14 @@ window.onload = function () {
 
     const role = localStorage.getItem("role");
 
-    if (role === "teamlead_sp") {
+if (role === "teamlead_sp") {
 
-        document.querySelectorAll(".admin-only")
-            .forEach(element => {
-                element.style.display = "none";
-            });
+    document.querySelectorAll(".admin-only")
+        .forEach(element => {
+            element.style.display = "none";
+        });
 
-    }
+}
 
 };
 // ----------------------------
