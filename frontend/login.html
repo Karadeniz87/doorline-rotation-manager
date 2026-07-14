@@ -3,22 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
+
+    <style>
+        body{
+            background:#111827;
+            color:white;
+            font-family:Arial;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
+        }
+
+        .login-box{
+            width:350px;
+            background:#1f2937;
+            padding:30px;
+            border-radius:15px;
+        }
+
+        input{
+            width:100%;
+            padding:12px;
+            margin-top:10px;
+            margin-bottom:20px;
+            border:none;
+            border-radius:8px;
+        }
+
+        button{
+            width:100%;
+            padding:12px;
+            border:none;
+            border-radius:8px;
+            background:#2563eb;
+            color:white;
+            font-size:18px;
+        }
+    </style>
 </head>
+
 <body>
 
-<h1>Doorline Login</h1>
+<div class="login-box">
 
-<input id="username" placeholder="Benutzername">
-<br><br>
+    <h1>Doorline Login</h1>
 
-<input id="password" type="password" placeholder="Passwort">
-<br><br>
+    <input
+        id="username"
+        placeholder="Benutzername"
+    >
 
-<button onclick="login()">
-    Login
-</button>
+    <input
+        id="password"
+        type="password"
+        placeholder="Passwort"
+    >
 
-<script src="/frontend/login.js"></script>
+    <button onclick="login()">
+        Login
+    </button>
+
+</div>
+
+<script>
+
+async function login(){
+
+    const response = await fetch("/login",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            username:
+                document.getElementById(
+                    "username"
+                ).value,
+
+            password:
+                document.getElementById(
+                    "password"
+                ).value
+        })
+    });
+
+    const data = await response.json();
+
+    if(data.success){
+        localStorage.setItem(
+            "user",
+            data.username
+        );
+
+        window.location.href="/";
+    }
+    else{
+        alert("Login fehlgeschlagen");
+    }
+}
+
+</script>
 
 </body>
 </html>
