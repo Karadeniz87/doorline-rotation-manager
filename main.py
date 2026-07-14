@@ -379,6 +379,30 @@ def create_tlsp(
     return {
         "message": "TLSP erstellt"
     }
+# --------------------------------------------------
+# Admin Passwort zurücksetzen
+# --------------------------------------------------
+
+@app.get("/reset-admin")
+def reset_admin(
+    db: Session = Depends(get_db)
+):
+    admin = db.query(EmployeeDB).filter(
+        EmployeeDB.username == "admin"
+    ).first()
+
+    if admin is None:
+        return {
+            "message": "Admin nicht gefunden"
+        }
+
+    admin.password = "141187"
+
+    db.commit()
+
+    return {
+        "message": "Admin Passwort zurückgesetzt"
+    }
 
 
 # --------------------------------------------------
