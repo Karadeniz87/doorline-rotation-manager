@@ -352,19 +352,7 @@ def login(
         "name": f"{user.firstname} {user.lastname}",
         "role": user.role
     }
-    @app.get("/create-tlsp")
-def create_tlsp(
-    db: Session = Depends(get_db)
-):
-    user = db.query(EmployeeDB).filter(
-        EmployeeDB.username == "tlsp"
-    ).first()
-
-    if user:
-        return {
-            "message": "TLSP existiert bereits"
-        }
-
+    
     tlsp = EmployeeDB(
         firstname="TL",
         lastname="SP",
