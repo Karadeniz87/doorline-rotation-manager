@@ -51,8 +51,8 @@ employees = [
             EmployeeDB(firstname="Rawad", lastname="Al Akle")
         ]
 
-        db.add_all(employees)
-        db.commit()
+    db.add_all(employees)
+    db.commit()
 
     db.close()
 
