@@ -241,34 +241,36 @@ def delete_employee(
     }
 
 
+# --------------------------------------------------
+# Login
+# --------------------------------------------------
+
 @app.post("/login")
 def login(
-    login_data: LoginRequest,
+    request: LoginRequest,
     db: Session = Depends(get_db)
 ):
 
     user = db.query(EmployeeDB).filter(
-        EmployeeDB.username == login_data.username
+        EmployeeDB.username == request.username
     ).first()
 
-    if user is None:
+    if not user:
         raise HTTPException(
             status_code=401,
             detail="Benutzer nicht gefunden"
         )
 
-    if user.password != login_data.password:
+    if user.password != request.password:
         raise HTTPException(
             status_code=401,
             detail="Falsches Passwort"
         )
 
     return {
-        "id": user.id,
-        "username": user.username,
-        "role": user.role,
-        "firstname": user.firstname,
-        "lastname": user.lastname
+        "success": True,
+        "name": f"{user.firstname} {user.lastname}",
+        "role": user.role
     }
 
 # --------------------------------------------------
