@@ -35,40 +35,40 @@ def seed_employees():
 
         employees = [
 
-            EmployeeDB(
-    firstname="Onur",
-    lastname="Yilmaz",
-    username="admin",
-    password="141187",
-    role="admin"
-),
+    EmployeeDB(
+        firstname="Onur",
+        lastname="Yilmaz",
+        username="admin",
+        password="141187",
+        role="admin"
+    ),
 
-EmployeeDB(
-    firstname="TL",
-    lastname="SP",
-    username="tlsp",
-    password="tesla",
-    role="teamlead_sp"
-),
+    EmployeeDB(
+        firstname="TL",
+        lastname="SP",
+        username="tlsp",
+        password="tesla",
+        role="teamlead_sp"
+    ),
 
-            EmployeeDB(firstname="Christian", lastname="Francke"),
-            EmployeeDB(firstname="Cagliyan", lastname="Aslandag"),
-            EmployeeDB(firstname="Mhd Nour", lastname="Fallah"),
-            EmployeeDB(firstname="Oliwia", lastname="Budkowska"),
-            EmployeeDB(firstname="Maxwell Kofi", lastname="Mensah"),
-            EmployeeDB(firstname="Adolphe Boumsong", lastname="Dimouk"),
-            EmployeeDB(firstname="Fabian", lastname="Dubaj"),
-            EmployeeDB(firstname="Salh", lastname="Alamash"),
-            EmployeeDB(firstname="Sarah Akuma", lastname="Ukpo"),
-            EmployeeDB(firstname="Germay", lastname="Mehari"),
-            EmployeeDB(firstname="Karolina", lastname="Włodarczyk"),
-            EmployeeDB(firstname="Md Jowel", lastname="Hossain"),
-            EmployeeDB(firstname="Renata", lastname="Molek"),
-            EmployeeDB(firstname="Thaer", lastname="Al Gharib"),
-            EmployeeDB(firstname="Kwame", lastname="Opoku"),
-            EmployeeDB(firstname="Rawad", lastname="Al Akle")
+    EmployeeDB(firstname="Christian", lastname="Francke"),
+    EmployeeDB(firstname="Cagliyan", lastname="Aslandag"),
+    EmployeeDB(firstname="Mhd Nour", lastname="Fallah"),
+    EmployeeDB(firstname="Oliwia", lastname="Budkowska"),
+    EmployeeDB(firstname="Maxwell Kofi", lastname="Mensah"),
+    EmployeeDB(firstname="Adolphe Boumsong", lastname="Dimouk"),
+    EmployeeDB(firstname="Fabian", lastname="Dubaj"),
+    EmployeeDB(firstname="Salh", lastname="Alamash"),
+    EmployeeDB(firstname="Sarah Akuma", lastname="Ukpo"),
+    EmployeeDB(firstname="Germay", lastname="Mehari"),
+    EmployeeDB(firstname="Karolina", lastname="Włodarczyk"),
+    EmployeeDB(firstname="Md Jowel", lastname="Hossain"),
+    EmployeeDB(firstname="Renata", lastname="Molek"),
+    EmployeeDB(firstname="Thaer", lastname="Al Gharib"),
+    EmployeeDB(firstname="Kwame", lastname="Opoku"),
+    EmployeeDB(firstname="Rawad", lastname="Al Akle")
 
-        ]
+]
 
         db.add_all(employees)
         db.commit()
