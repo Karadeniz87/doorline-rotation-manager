@@ -470,12 +470,15 @@ def run_rotation(
                 skill_a = f"skill_{station_a}"
                 skill_b = f"skill_{station_b}"
 
-                if (
-                    getattr(employee, skill_a, False)
-                    and getattr(employee, skill_b, False)
-                ):
-                    selected_employee = employee
-                    break
+                if employee.last_station == station:
+    continue
+
+if (
+    getattr(employee, skill_a, False)
+    and getattr(employee, skill_b, False)
+):
+    selected_employee = employee
+    break
 
             else:
 
