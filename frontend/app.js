@@ -60,14 +60,39 @@ async function loadStations() {
                 employee: null
             };
 
-            let statusClass = "green-status";
+let statusClass = "green-status";
 
-            if (
-                !left.employee &&
-                !right.employee
-            ) {
-                statusClass = "red-status";
-            }
+/* Beide Stationen leer */
+if (
+    !left.employee &&
+    !right.employee
+){
+    statusClass = "red-status";
+}
+
+/* Eine Seite besetzt */
+else if (
+    !left.employee ||
+    !right.employee
+){
+    statusClass = "yellow-status";
+}
+
+/* Doppeltakt Stationen */
+const doubleTaktStations = [
+    "40L","40R",
+    "50L","50R",
+    "60L","60R",
+    "70L","70R"
+];
+
+if(
+    doubleTaktStations.includes(
+        left.station
+    )
+){
+    statusClass = "yellow-status";
+}
 
             container.innerHTML += `
                 <div class="station-row">
