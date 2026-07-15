@@ -150,45 +150,44 @@ else {
 
         data.stations.forEach(station => {
 
-            container.innerHTML += `
-                <div class="station-card">
+    const doubleTaktStations = [
+        "40L","40R",
+        "50L","50R",
+        "60L","60R",
+        "70L","70R"
+    ];
 
-                    <h3>${station.station}</h3>
+    const isDouble =
+        doubleTaktStations.includes(
+            station.station
+        );
 
-<p>
-    👤 ${
-        station.employee
-            ? station.employee
-            : "Nicht besetzt"
-    }
-</p>
+    container.innerHTML += `
+        <div class="station-card">
 
-                    ${
-                        station.double_takt_allowed
-                        ? `
-                        <small>
-                            🔵 Doppeltakt möglich
-                        </small>
-                        `
-                        : ""
-                    }
+            <h3>${station.station}</h3>
 
-                    ${
-                        station.support_required
-                        ? `
-                        <p style="
-                            color:red;
-                            font-weight:bold;
-                        ">
-                            Support benötigt
-                        </p>
-                        `
-                        : ""
-                    }
+            <p>
+                👤 ${
+                    station.employee
+                    ? station.employee
+                    : "Nicht besetzt"
+                }
+            </p>
 
-                </div>
-            `;
-        });
+            ${
+                isDouble
+                ? `
+                <small>
+                    🔵 Doppeltakt möglich
+                </small>
+                `
+                : ""
+            }
+
+        </div>
+    `;
+});
 
         const result =
             document.getElementById(
