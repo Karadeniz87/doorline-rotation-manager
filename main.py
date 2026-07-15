@@ -492,6 +492,7 @@ if (
             assigned_ids.add(selected_employee.id)
 
             selected_employee.station = station
+            selected_employee.last_station = station
 
             # -----------------------
             # Fairness Gewichtung
