@@ -659,3 +659,132 @@ pre{
 
     border-radius:50px;
 }
+/* -----------------------------------
+   Tesla Produktionslinie
+----------------------------------- */
+
+.station-row{
+    display:grid;
+    grid-template-columns: 1fr 70px 1fr;
+    align-items:center;
+    gap:20px;
+    margin-bottom:18px;
+}
+
+.station-left,
+.station-right{
+    background: rgba(31,41,55,0.75);
+    backdrop-filter: blur(12px);
+
+    border:1px solid rgba(255,255,255,0.08);
+
+    border-radius:18px;
+
+    padding:18px;
+
+    min-height:90px;
+
+    box-shadow:
+        0 8px 32px rgba(0,0,0,0.35);
+
+    transition:0.3s;
+}
+
+.station-left:hover,
+.station-right:hover{
+    transform:translateY(-3px);
+
+    border-color:#2563EB;
+
+    box-shadow:
+        0 0 25px rgba(37,99,235,0.35);
+}
+
+.station-left h3,
+.station-right h3{
+    color:#60A5FA;
+    margin-bottom:10px;
+    font-size:22px;
+}
+
+.station-left p,
+.station-right p{
+    color:#D1D5DB;
+    font-size:15px;
+}
+
+/* -----------------------------------
+   Status LEDs
+----------------------------------- */
+
+.status-circle{
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    margin:auto;
+}
+
+.green-status{
+    background:#22C55E;
+    box-shadow:
+        0 0 12px #22C55E,
+        0 0 24px #22C55E;
+}
+
+.yellow-status{
+    background:#FACC15;
+    box-shadow:
+        0 0 12px #FACC15,
+        0 0 24px #FACC15;
+}
+
+.red-status{
+    background:#EF4444;
+    box-shadow:
+        0 0 12px #EF4444,
+        0 0 24px #EF4444;
+}
+
+/* -----------------------------------
+   Vertikale Produktionslinie
+----------------------------------- */
+
+.production-line{
+    position:relative;
+
+    width:6px;
+    height:100%;
+
+    margin:auto;
+
+    border-radius:20px;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #22C55E,
+            #FACC15,
+            #EF4444
+        );
+
+    box-shadow:
+        0 0 20px rgba(255,255,255,0.2);
+}
+
+/* -----------------------------------
+   Mobile Ansicht
+----------------------------------- */
+
+@media(max-width:768px){
+
+    .station-row{
+        grid-template-columns:1fr;
+        text-align:center;
+    }
+
+    .production-line{
+        width:100%;
+        height:6px;
+    }
+
+}
