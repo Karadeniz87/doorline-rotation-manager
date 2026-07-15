@@ -532,3 +532,42 @@ pre{
     background:#EF4444;
     box-shadow:0 0 12px #EF4444;
 }
+.station-row{
+    display:grid;
+    grid-template-columns:1fr 60px 1fr;
+    gap:15px;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.station-left,
+.station-right{
+    background:rgba(31,41,55,0.75);
+    backdrop-filter:blur(12px);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:16px;
+    padding:15px;
+    min-height:90px;
+}
+
+.status-circle{
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    margin:auto;
+}
+
+.green-status{
+    background:#22C55E;
+    box-shadow:0 0 12px #22C55E;
+}
+
+.yellow-status{
+    background:#EAB308;
+    box-shadow:0 0 12px #EAB308;
+}
+
+.red-status{
+    background:#EF4444;
+    box-shadow:0 0 12px #EF4444;
+}
