@@ -479,13 +479,16 @@ if "+" in station:
         selected_employee = employee
         break
 
-            else:
+else:
 
-                skill_name = f"skill_{station}"
+    skill_name = f"skill_{station}"
 
-                if getattr(employee, skill_name, False):
-                    selected_employee = employee
-                    break
+    if employee.last_station == station:
+        continue
+
+    if getattr(employee, skill_name, False):
+        selected_employee = employee
+        break
         if selected_employee:
 
             assigned_ids.add(selected_employee.id)
