@@ -79,11 +79,12 @@ async function loadStations() {
                         </p>
                     </div>
 
-                    <div class="
-                        status-circle
-                        ${statusClass}
-                    ">
-                    </div>
+                <div class="production-line">
+    <div class="
+        status-circle
+        ${statusClass}
+    "></div>
+</div>
 
                     <div class="station-right">
                         <h3>${right.station}</h3>
