@@ -456,46 +456,47 @@ def run_rotation(
     # Ab hier ALLES 4 Leerzeichen eingerückt
     for station in current_stations:
 
-        selected_employee = None
+    selected_employee = None
 
-        for employee in active_employees:
+    for employee in active_employees:
 
-            if employee.id in assigned_ids:
+        if employee.id in assigned_ids:
+            continue
+
+        if "+" in station:
+
+            station_a, station_b = station.split("+")
+
+            skill_a = f"skill_{station_a}"
+            skill_b = f"skill_{station_b}"
+
+            if employee.last_station == station:
                 continue
-if "+" in station:
 
-    station_a, station_b = station.split("+")
+            if (
+                getattr(employee, skill_a, False)
+                and getattr(employee, skill_b, False)
+            ):
+                selected_employee = employee
+                break
 
-    skill_a = f"skill_{station_a}"
-    skill_b = f"skill_{station_b}"
+        else:
 
-    if employee.last_station == station:
-        continue
+            skill_name = f"skill_{station}"
 
-    if (
-        getattr(employee, skill_a, False)
-        and getattr(employee, skill_b, False)
-    ):
-        selected_employee = employee
-        break
+            if employee.last_station == station:
+                continue
 
-else:
+            if getattr(employee, skill_name, False):
+                selected_employee = employee
+                break
 
-    skill_name = f"skill_{station}"
+    if selected_employee:
 
-    if employee.last_station == station:
-        continue
+        assigned_ids.add(selected_employee.id)
 
-    if getattr(employee, skill_name, False):
-        selected_employee = employee
-        break
-        if selected_employee:
-
-            assigned_ids.add(selected_employee.id)
-
-            selected_employee.station = station
-            selected_employee.last_station = station
-
+        selected_employee.station = station
+        selected_employee.last_station = station
             # -----------------------
             # Fairness Gewichtung
             # -----------------------
