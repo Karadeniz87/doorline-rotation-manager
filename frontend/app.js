@@ -94,33 +94,33 @@ if(
     statusClass = "yellow-status";
 }
 
-            container.innerHTML += `
-                <div class="station-row">
+container.innerHTML += `
+<div class="station-row">
 
-                    <div class="station-left">
-                        <h3>${left.station}</h3>
-                        <p>
-                            👤 ${left.employee || "Nicht besetzt"}
-                        </p>
-                    </div>
+    <div class="station-left">
+        <h3>${left.station}</h3>
+        <p>
+            👤 ${left.employee || "Nicht besetzt"}
+        </p>
+    </div>
 
-                <div class="production-line">
-    <div class="
-        status-circle
-        ${statusClass}
-    "></div>
+    <div class="production-line">
+        <div class="
+            status-circle
+            ${statusClass}
+        ">
+        </div>
+    </div>
+
+    <div class="station-right">
+        <h3>${right.station}</h3>
+        <p>
+            👤 ${right.employee || "Nicht besetzt"}
+        </p>
+    </div>
+
 </div>
-
-                    <div class="station-right">
-                        <h3>${right.station}</h3>
-                        <p>
-                            👤 ${right.employee || "Nicht besetzt"}
-                        </p>
-                    </div>
-
-                </div>
-            `;
-        }
+`;
 
     } catch (error) {
 
