@@ -571,6 +571,37 @@ def run_rotation(
         "support_employees": support_employees,
         "staffing_status": staffing_status
     }
+    # --------------------------------------------------
+# Stations API
+# --------------------------------------------------
+
+@app.get("/stations")
+def get_stations(
+    db: Session = Depends(get_db)
+):
+
+    employees = db.query(EmployeeDB).all()
+
+    stations = []
+
+    for station in normal_stations:
+
+        employee = next(
+            (
+                e for e in employees
+                if e.station == station
+            ),
+            None
+        )
+
+        stations.append({
+            "station": station,
+            "employee":
+                f"{employee.firstname} {employee.lastname}"
+                if employee else None
+        })
+
+    return stations
 # --------------------------------------------------
 # KPI
 # --------------------------------------------------
