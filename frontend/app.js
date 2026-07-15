@@ -86,20 +86,18 @@ const right = stations[i + 1] || {
                 ${statusClass}
             "></div>
 
-            <div class="station-right">
+<div class="station-right">
 
-                <h3>
-                    ${right.station || ""}
-                </h3>
+    <h3>${right.station}</h3>
 
-                <p>
-                    👤 ${
-                        right.employee ||
-                        "Nicht besetzt"
-                    }
-                </p>
+    <p>
+        👤 ${
+            right.employee
+            || "Nicht besetzt"
+        }
+    </p>
 
-            </div>
+</div>
 
         </div>
         `;
