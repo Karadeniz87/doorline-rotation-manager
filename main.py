@@ -562,9 +562,9 @@ elif unassigned <= 2:
 else:
     staffing_status = "red"
 
-db.commit()
+    db.commit()
 
-return {
+    return {
     "message": "Rotation durchgeführt",
     "double_takt_mode": auto_double_takt,
     "available_employees": available_count,
