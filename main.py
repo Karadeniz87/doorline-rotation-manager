@@ -491,12 +491,12 @@ for station in current_stations:
                 selected_employee = employee
                 break
 
-if selected_employee:
+    if selected_employee:
 
-    assigned_ids.add(selected_employee.id)
+        assigned_ids.add(selected_employee.id)
 
-    selected_employee.station = station
-    selected_employee.last_station = station
+        selected_employee.station = station
+        selected_employee.last_station = station
 
     # -----------------------
     # Fairness Gewichtung
