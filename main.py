@@ -498,9 +498,6 @@ if selected_employee:
     selected_employee.station = station
     selected_employee.last_station = station
 
-    # -----------------------
-    # Fairness Gewichtung
-    # -----------------------
     weight = 1
 
     if "60" in station:
@@ -518,7 +515,6 @@ if selected_employee:
     if "100" in station:
         weight = 2
 
-    # Doppeltakt bekommt zusätzliche Punkte
     if "+" in station:
         weight += 2
 
@@ -526,9 +522,7 @@ if selected_employee:
 
     rotation_result.append({
         "station": station,
-        "employee":
-            f"{selected_employee.firstname} "
-            f"{selected_employee.lastname}"
+        "employee": f"{selected_employee.firstname} {selected_employee.lastname}"
     })
 
 else:
@@ -538,47 +532,46 @@ else:
         "employee": None
     })
 
-    # ------------------------------------
-    # Nicht eingeplante Mitarbeiter
-    # ------------------------------------
-    for employee in active_employees:
 
-        if employee.id not in assigned_ids:
+# ------------------------------------
+# Nicht eingeplante Mitarbeiter
+# ------------------------------------
+for employee in active_employees:
 
-            employee.station = "Support"
+    if employee.id not in assigned_ids:
 
-            support_employees.append(
-                f"{employee.firstname} "
-                f"{employee.lastname}"
-            )
+        employee.station = "Support"
 
-    # ------------------------------------
-    # Besetzungsampel
-    # ------------------------------------
-    unassigned = sum(
-        1 for s in rotation_result
-        if s["employee"] is None
-    )
+        support_employees.append(
+            f"{employee.firstname} {employee.lastname}"
+        )
 
-    if unassigned == 0:
-        staffing_status = "green"
 
-    elif unassigned <= 2:
-        staffing_status = "yellow"
+# ------------------------------------
+# Besetzungsampel
+# ------------------------------------
+unassigned = sum(
+    1 for s in rotation_result
+    if s["employee"] is None
+)
 
-    else:
-        staffing_status = "red"
+if unassigned == 0:
+    staffing_status = "green"
+elif unassigned <= 2:
+    staffing_status = "yellow"
+else:
+    staffing_status = "red"
 
-    db.commit()
+db.commit()
 
-    return {
-        "message": "Rotation durchgeführt",
-        "double_takt_mode": auto_double_takt,
-        "available_employees": available_count,
-        "stations": rotation_result,
-        "support_employees": support_employees,
-        "staffing_status": staffing_status
-    }
+return {
+    "message": "Rotation durchgeführt",
+    "double_takt_mode": auto_double_takt,
+    "available_employees": available_count,
+    "stations": rotation_result,
+    "support_employees": support_employees,
+    "staffing_status": staffing_status
+}
     # --------------------------------------------------
 # Stations API
 # --------------------------------------------------
