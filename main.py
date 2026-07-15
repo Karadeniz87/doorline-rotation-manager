@@ -462,23 +462,22 @@ def run_rotation(
 
             if employee.id in assigned_ids:
                 continue
+if "+" in station:
 
-            if "+" in station:
+    station_a, station_b = station.split("+")
 
-                station_a, station_b = station.split("+")
+    skill_a = f"skill_{station_a}"
+    skill_b = f"skill_{station_b}"
 
-                skill_a = f"skill_{station_a}"
-                skill_b = f"skill_{station_b}"
+    if employee.last_station == station:
+        continue
 
-                if employee.last_station == station:
-                    continue
-
-if (
-    getattr(employee, skill_a, False)
-    and getattr(employee, skill_b, False)
-):
-    selected_employee = employee
-    break
+    if (
+        getattr(employee, skill_a, False)
+        and getattr(employee, skill_b, False)
+    ):
+        selected_employee = employee
+        break
 
             else:
 
