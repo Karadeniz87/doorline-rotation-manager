@@ -491,37 +491,38 @@ for station in current_stations:
                 selected_employee = employee
                 break
 
-    if selected_employee:
+if selected_employee:
 
-        assigned_ids.add(selected_employee.id)
+    assigned_ids.add(selected_employee.id)
 
-        selected_employee.station = station
-        selected_employee.last_station = station
-            # -----------------------
-            # Fairness Gewichtung
-            # -----------------------
-            weight = 1
+    selected_employee.station = station
+    selected_employee.last_station = station
 
-            if "60" in station:
-                weight = 2
+    # -----------------------
+    # Fairness Gewichtung
+    # -----------------------
+    weight = 1
 
-            if "70" in station:
-                weight = 2
+    if "60" in station:
+        weight = 2
 
-            if "80" in station:
-                weight = 3
+    if "70" in station:
+        weight = 2
 
-            if "90" in station:
-                weight = 2
+    if "80" in station:
+        weight = 3
 
-            if "100" in station:
-                weight = 2
+    if "90" in station:
+        weight = 2
 
-            # Doppeltakt bekommt zusätzliche Punkte
-            if "+" in station:
-                weight += 2
+    if "100" in station:
+        weight = 2
 
-            selected_employee.fairness_points += weight
+    # Doppeltakt bekommt zusätzliche Punkte
+    if "+" in station:
+        weight += 2
+
+    selected_employee.fairness_points += weight
 
             rotation_result.append({
                 "station": station,
