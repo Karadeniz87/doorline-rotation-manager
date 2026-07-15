@@ -51,8 +51,12 @@ async function loadStations(){
 
     for(let i=0;i<stations.length;i+=2){
 
-        const left = stations[i];
-        const right = stations[i+1] || {};
+        cconst left = stations[i];
+
+const right = stations[i + 1] || {
+    station: "",
+    employee: null
+};
 
         let statusClass = "green-status";
 
