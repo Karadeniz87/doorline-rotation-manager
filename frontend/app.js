@@ -32,68 +32,86 @@ async function loadStats() {
 }
 
 
-async function loadStations(){
+async function loadStations() {
 
-    const response =
-        await fetch("/stations");
+    try {
 
-    const stations =
-        await response.json();
+        const response =
+            await fetch("/stations");
 
-    const container =
-        document.getElementById(
-            "stations_container"
-        );
+        const stations =
+            await response.json();
 
-    container.innerHTML = "";
+        const container =
+            document.getElementById(
+                "stations_container"
+            );
 
-    for(let i=0;i<stations.length;i+=2){
+        if (!container) return;
 
-        const left = stations[i];
-        const right = stations[i+1];
+        container.innerHTML = "";
 
-        let statusClass = "green-status";
+        for (let i = 0; i < stations.length; i += 2) {
 
-        if(
-            !left.employee &&
-            !right.employee
-        ){
-            statusClass = "red-status";
+            const left =
+                stations[i];
+
+            const right =
+                stations[i + 1];
+
+            let statusClass =
+                "green-status";
+
+            if (
+                !left?.employee &&
+                !right?.employee
+            ) {
+                statusClass =
+                    "red-status";
+            }
+
+            container.innerHTML += `
+                <div class="station-row">
+
+                    <div class="station-left">
+
+                        <h3>
+                            ${left?.station || "-"}
+                        </h3>
+
+                        <p>
+                            👤 ${
+                                left?.employee
+                                || "Nicht besetzt"
+                            }
+                        </p>
+
+                    </div>
+
+                    <div class="
+                        status-circle
+                        ${statusClass}
+                    ">
+                    </div>
+
+                    <div class="station-right">
+
+                        <h3>
+                            ${right?.station || "-"}
+                        </h3>
+
+                        <p>
+                            👤 ${
+                                right?.employee
+                                || "Nicht besetzt"
+                            }
+                        </p>
+
+                    </div>
+
+                </div>
+            `;
         }
-
-        container.innerHTML += `
-        <div class="station-row">
-
-            <div class="station-left">
-                <h3>${left.station}</h3>
-                <p>
-                    ${
-                        left.employee
-                        || "Nicht besetzt"
-                    }
-                </p>
-            </div>
-
-            <div class="
-                status-circle
-                ${statusClass}
-            ">
-            </div>
-
-            <div class="station-right">
-                <h3>${right.station}</h3>
-                <p>
-                    ${
-                        right.employee
-                        || "Nicht besetzt"
-                    }
-                </p>
-            </div>
-
-        </div>
-        `;
-    }
-}
 
     } catch (error) {
 
@@ -101,6 +119,7 @@ async function loadStations(){
             "Stationsfehler:",
             error
         );
+
     }
 }
 
