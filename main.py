@@ -471,7 +471,7 @@ def run_rotation(
                 skill_b = f"skill_{station_b}"
 
                 if employee.last_station == station:
-    continue
+                    continue
 
 if (
     getattr(employee, skill_a, False)
