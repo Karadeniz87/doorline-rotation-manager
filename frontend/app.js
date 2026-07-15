@@ -32,86 +32,75 @@ async function loadStats() {
 }
 
 
-async function loadStations() {
+async function loadStations(){
 
-    try {
+    const response =
+        await fetch("/stations");
 
-        const response =
-            await fetch("/stations");
+    const stations =
+        await response.json();
 
-        const stations =
-            await response.json();
+    const container =
+        document.getElementById(
+            "stations_container"
+        );
 
-        const container =
-            document.getElementById(
-                "stations_container"
-            );
+    if(!container) return;
 
-        if (!container) return;
+    container.innerHTML = "";
 
-        container.innerHTML = "";
+    for(let i=0;i<stations.length;i+=2){
 
-        for (let i = 0; i < stations.length; i += 2) {
+        const left = stations[i];
+        const right = stations[i+1] || {};
 
-            const left =
-                stations[i];
+        let statusClass = "green-status";
 
-            const right =
-                stations[i + 1];
-
-            let statusClass =
-                "green-status";
-
-            if (
-                !left?.employee &&
-                !right?.employee
-            ) {
-                statusClass =
-                    "red-status";
-            }
-
-            container.innerHTML += `
-                <div class="station-row">
-
-                    <div class="station-left">
-
-                        <h3>
-                            ${left?.station || "-"}
-                        </h3>
-
-                        <p>
-                            👤 ${
-                                left?.employee
-                                || "Nicht besetzt"
-                            }
-                        </p>
-
-                    </div>
-
-                    <div class="
-                        status-circle
-                        ${statusClass}
-                    ">
-                    </div>
-
-                    <div class="station-right">
-
-                        <h3>
-                            ${right?.station || "-"}
-                        </h3>
-
-                        <p>
-                            👤 ${
-                                right?.employee
-                                || "Nicht besetzt"
-                            }
-                        </p>
-
-                    </div>
-
-                </div>
-            `;
+        if(
+            !left.employee &&
+            !right.employee
+        ){
+            statusClass = "red-status";
         }
+
+        container.innerHTML += `
+        <div class="station-row">
+
+            <div class="station-left">
+                <h3>${left.station}</h3>
+
+                <p>
+                    👤 ${
+                        left.employee ||
+                        "Nicht besetzt"
+                    }
+                </p>
+            </div>
+
+            <div class="
+                status-circle
+                ${statusClass}
+            "></div>
+
+            <div class="station-right">
+
+                <h3>
+                    ${right.station || ""}
+                </h3>
+
+                <p>
+                    👤 ${
+                        right.employee ||
+                        "Nicht besetzt"
+                    }
+                </p>
+
+            </div>
+
+        </div>
+        `;
+    }
+}
 
     } catch (error) {
 
