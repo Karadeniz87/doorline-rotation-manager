@@ -453,125 +453,136 @@ def run_rotation(
         key=lambda x: x.fairness_points
     )
 
-    # Ab hier ALLES 4 Leerzeichen eingerückt
-for station in current_stations:
+    # ------------------------------------
+    # Stationsbesetzung
+    # ------------------------------------
+    for station in current_stations:
 
-    selected_employee = None
+        selected_employee = None
 
-    for employee in active_employees:
+        for employee in active_employees:
 
-        if employee.id in assigned_ids:
-            continue
-
-        if "+" in station:
-
-            station_a, station_b = station.split("+")
-
-            skill_a = f"skill_{station_a}"
-            skill_b = f"skill_{station_b}"
-
-            if employee.last_station == station:
+            if employee.id in assigned_ids:
                 continue
 
-            if (
-                getattr(employee, skill_a, False)
-                and getattr(employee, skill_b, False)
-            ):
-                selected_employee = employee
-                break
+            if "+" in station:
+
+                station_a, station_b = station.split("+")
+
+                skill_a = f"skill_{station_a}"
+                skill_b = f"skill_{station_b}"
+
+                if employee.last_station == station:
+                    continue
+
+                if (
+                    getattr(employee, skill_a, False)
+                    and getattr(employee, skill_b, False)
+                ):
+                    selected_employee = employee
+                    break
+
+            else:
+
+                skill_name = f"skill_{station}"
+
+                if employee.last_station == station:
+                    continue
+
+                if getattr(employee, skill_name, False):
+                    selected_employee = employee
+                    break
+
+        if selected_employee:
+
+            assigned_ids.add(
+                selected_employee.id
+            )
+
+            selected_employee.station = station
+            selected_employee.last_station = station
+
+            # -----------------------
+            # Fairness Gewichtung
+            # -----------------------
+            weight = 1
+
+            if "60" in station:
+                weight = 2
+
+            if "70" in station:
+                weight = 2
+
+            if "80" in station:
+                weight = 3
+
+            if "90" in station:
+                weight = 2
+
+            if "100" in station:
+                weight = 2
+
+            # Doppeltakt bekommt zusätzliche Punkte
+            if "+" in station:
+                weight += 2
+
+            selected_employee.fairness_points += weight
+
+            rotation_result.append({
+                "station": station,
+                "employee":
+                    f"{selected_employee.firstname} "
+                    f"{selected_employee.lastname}"
+            })
 
         else:
 
-            skill_name = f"skill_{station}"
+            rotation_result.append({
+                "station": station,
+                "employee": None
+            })
 
-            if employee.last_station == station:
-                continue
+    # ------------------------------------
+    # Support Mitarbeiter
+    # ------------------------------------
+    for employee in active_employees:
 
-            if getattr(employee, skill_name, False):
-                selected_employee = employee
-                break
+        if employee.id not in assigned_ids:
 
-if selected_employee:
+            employee.station = "Support"
 
-    assigned_ids.add(selected_employee.id)
+            support_employees.append(
+                f"{employee.firstname} "
+                f"{employee.lastname}"
+            )
 
-    selected_employee.station = station
-    selected_employee.last_station = station
+    # ------------------------------------
+    # Besetzungsampel
+    # ------------------------------------
+    unassigned = sum(
+        1 for s in rotation_result
+        if s["employee"] is None
+    )
 
-    weight = 1
+    if unassigned == 0:
+        staffing_status = "green"
 
-    if "60" in station:
-        weight = 2
+    elif unassigned <= 2:
+        staffing_status = "yellow"
 
-    if "70" in station:
-        weight = 2
-
-    if "80" in station:
-        weight = 3
-
-    if "90" in station:
-        weight = 2
-
-    if "100" in station:
-        weight = 2
-
-    if "+" in station:
-        weight += 2
-
-    selected_employee.fairness_points += weight
-
-    rotation_result.append({
-        "station": station,
-        "employee": f"{selected_employee.firstname} {selected_employee.lastname}"
-    })
-
-else:
-
-    rotation_result.append({
-        "station": station,
-        "employee": None
-    })
-
-
-# ------------------------------------
-# Nicht eingeplante Mitarbeiter
-# ------------------------------------
-for employee in active_employees:
-
-    if employee.id not in assigned_ids:
-
-        employee.station = "Support"
-
-        support_employees.append(
-            f"{employee.firstname} {employee.lastname}"
-        )
-
-
-# ------------------------------------
-# Besetzungsampel
-# ------------------------------------
-unassigned = sum(
-    1 for s in rotation_result
-    if s["employee"] is None
-)
-
-if unassigned == 0:
-    staffing_status = "green"
-elif unassigned <= 2:
-    staffing_status = "yellow"
-else:
-    staffing_status = "red"
+    else:
+        staffing_status = "red"
 
     db.commit()
 
     return {
-    "message": "Rotation durchgeführt",
-    "double_takt_mode": auto_double_takt,
-    "available_employees": available_count,
-    "stations": rotation_result,
-    "support_employees": support_employees,
-    "staffing_status": staffing_status
-}
+        "message": "Rotation durchgeführt",
+        "double_takt_mode": auto_double_takt,
+        "available_employees": available_count,
+        "stations": rotation_result,
+        "support_employees": support_employees,
+        "staffing_status": staffing_status
+    }
     # --------------------------------------------------
 # Stations API
 # --------------------------------------------------
