@@ -454,7 +454,7 @@ def run_rotation(
     )
 
     # Ab hier ALLES 4 Leerzeichen eingerückt
-    for station in current_stations:
+for station in current_stations:
 
     selected_employee = None
 
