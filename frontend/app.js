@@ -53,26 +53,31 @@ async function loadStations() {
 
         for (let i = 0; i < stations.length; i += 2) {
 
-async function loadStations(){
+async function loadStations() {
 
     try {
 
-        const response =
-            await fetch("/stations");
+        const response = await fetch("/stations");
 
-        const stations =
-            await response.json();
+        const stations = await response.json();
 
         const container =
             document.getElementById(
                 "stations_container"
             );
 
-        if(!container) return;
+        if (!container) return;
 
         container.innerHTML = "";
 
-        for(let i=0;i<stations.length;i+=2){
+        const doubleTaktStations = [
+            "40L", "40R",
+            "50L", "50R",
+            "60L", "60R",
+            "70L", "70R"
+        ];
+
+        for (let i = 0; i < stations.length; i += 2) {
 
             const left = stations[i];
 
@@ -83,31 +88,26 @@ async function loadStations(){
 
             let statusClass = "green-status";
 
-            if(
+            // Beide Seiten leer
+            if (
                 !left.employee &&
                 !right.employee
-            ){
+            ) {
                 statusClass = "red-status";
             }
-            else if(
+
+            // Eine Seite leer
+            else if (
                 !left.employee ||
                 !right.employee
-            ){
+            ) {
                 statusClass = "yellow-status";
             }
 
-            const doubleTaktStations = [
-                "40L","40R",
-                "50L","50R",
-                "60L","60R",
-                "70L","70R"
-            ];
-
-            if(
-                doubleTaktStations.includes(
-                    left.station
-                )
-            ){
+            // Doppeltakt Station
+            if (
+                doubleTaktStations.includes(left.station)
+            ) {
                 statusClass = "yellow-status";
             }
 
@@ -122,10 +122,7 @@ async function loadStations(){
                 </div>
 
                 <div class="production-line">
-                    <div class="
-                        status-circle
-                        ${statusClass}
-                    ">
+                    <div class="status-circle ${statusClass}">
                     </div>
                 </div>
 
@@ -139,6 +136,15 @@ async function loadStations(){
             </div>
             `;
         }
+
+    } catch (error) {
+
+        console.error(
+            "Stationsfehler:",
+            error
+        );
+    }
+}
 
     } catch (error) {
 
