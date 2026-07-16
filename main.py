@@ -471,54 +471,54 @@ for station in current_stations:
         selected_employee = employee
         break
 
-    if selected_employee:
+if selected_employee:
 
-        assigned_ids.add(
-            selected_employee.id
-        )
+    assigned_ids.add(
+        selected_employee.id
+    )
 
-        selected_employee.station = station
-        selected_employee.last_station = station
+    selected_employee.station = station
+    selected_employee.last_station = station
 
-            # -----------------------
-            # Fairness Gewichtung
-            # -----------------------
-            weight = 1
+    # -----------------------
+    # Fairness Gewichtung
+    # -----------------------
+    weight = 1
 
-            if "60" in station:
-                weight = 2
+    if "60" in station:
+        weight = 2
 
-            if "70" in station:
-                weight = 2
+    if "70" in station:
+        weight = 2
 
-            if "80" in station:
-                weight = 3
+    if "80" in station:
+        weight = 3
 
-            if "90" in station:
-                weight = 2
+    if "90" in station:
+        weight = 2
 
-            if "100" in station:
-                weight = 2
+    if "100" in station:
+        weight = 2
 
-            # Doppeltakt bekommt zusätzliche Punkte
-            if "+" in station:
-                weight += 2
+    # Doppeltakt bekommt zusätzliche Punkte
+    if "+" in station:
+        weight += 2
 
-            selected_employee.fairness_points += weight
+    selected_employee.fairness_points += weight
 
-            rotation_result.append({
-                "station": station,
-                "employee":
-                    f"{selected_employee.firstname} "
-                    f"{selected_employee.lastname}"
-            })
+    rotation_result.append({
+        "station": station,
+        "employee":
+            f"{selected_employee.firstname} "
+            f"{selected_employee.lastname}"
+    })
 
-        else:
+else:
 
-            rotation_result.append({
-                "station": station,
-                "employee": None
-            })
+    rotation_result.append({
+        "station": station,
+        "employee": None
+    })
 
     # ------------------------------------
     # Support Mitarbeiter
