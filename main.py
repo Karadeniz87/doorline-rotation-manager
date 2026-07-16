@@ -542,25 +542,23 @@ else:
         if s["employee"] is None
     )
 
-    if unassigned == 0:
-        staffing_status = "green"
+if unassigned == 0:
+    staffing_status = "green"
+elif unassigned <= 2:
+    staffing_status = "yellow"
+else:
+    staffing_status = "red"
 
-    elif unassigned <= 2:
-        staffing_status = "yellow"
+db.commit()
 
-    else:
-        staffing_status = "red"
-
-    db.commit()
-
-    return {
-        "message": "Rotation durchgeführt",
-        "double_takt_mode": auto_double_takt,
-        "available_employees": available_count,
-        "stations": rotation_result,
-        "support_employees": support_employees,
-        "staffing_status": staffing_status
-    }
+return {
+    "message": "Rotation durchgeführt",
+    "double_takt_mode": auto_double_takt,
+    "available_employees": available_count,
+    "stations": rotation_result,
+    "support_employees": support_employees,
+    "staffing_status": staffing_status
+}
     # --------------------------------------------------
 # Stations API
 # --------------------------------------------------
