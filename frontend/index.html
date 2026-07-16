@@ -13,15 +13,7 @@
 
 <body>
 
-<div class="section">
-
-    <h2>🏭 Stationsübersicht</h2>
-
-    <div id="stations_container">
-
-    </div>
-
-</div>
+<div class="container">
 
     <header class="header">
         <h1>🚗 Doorline Rotation Manager</h1>
@@ -29,7 +21,6 @@
     </header>
 
     <!-- KPI Karten -->
-
     <div class="cards">
 
         <div class="card">
@@ -61,66 +52,65 @@
             <h3>Doppeltakt</h3>
             <p id="double_takt">0</p>
         </div>
+
         <div class="card">
-    <h3>Besetzung</h3>
-    <p id="staffing_status">⚪ Unbekannt</p>
-</div>
+            <h3>Besetzung</h3>
+            <p id="staffing_status">⚪ Unbekannt</p>
+        </div>
 
     </div>
 
     <!-- Aktionen -->
-
     <div class="actions">
 
-    <button onclick="runRotation()">
-        🔄 Rotation starten
-    </button>
+        <button onclick="runRotation()">
+            🔄 Rotation starten
+        </button>
 
-    <button onclick="window.location.href='/frontend/employees.html'">
-        👥 Mitarbeiter verwalten
-    </button>
+        <button onclick="window.location.href='/frontend/employees.html'">
+            👥 Mitarbeiter verwalten
+        </button>
 
-<button
-    id="skill_button"
-    class="admin-only"
-    onclick="window.location.href='/frontend/skills.html'">
-    ✅ Skillmatrix
-</button>
-    <button onclick="window.location.href='/frontend/stations.html'">
-        🏭 Stationen
-    </button>
+        <button
+            id="skill_button"
+            class="admin-only"
+            onclick="window.location.href='/frontend/skills.html'">
+            ✅ Skillmatrix
+        </button>
 
-    <button class="admin-only"
+        <button onclick="window.location.href='/frontend/stations.html'">
+            🏭 Stationen
+        </button>
+
+        <button
+            class="admin-only"
             onclick="window.location.href='/frontend/kpi.html'">
-        📊 KPI Dashboard
-    </button>
+            📊 KPI Dashboard
+        </button>
 
-</div>
+    </div>
 
     <!-- Stationsübersicht -->
+    <div class="section">
 
-<div class="section">
+        <h2>🏭 Stationsübersicht</h2>
 
-    <h2>🏭 Stationsübersicht</h2>
+        <div id="stations_container"></div>
 
-    <div id="stations_container"></div>
+    </div>
 
-</div>
+    <!-- Rotation Ergebnis -->
+    <div class="section">
 
-<!-- Rotation Ergebnis -->
+        <h2>🔄 Rotation Ergebnis</h2>
 
-<div class="section">
-
-    <h2>🔄 Rotation Ergebnis</h2>
-
-    <pre id="rotation_result">
+        <pre id="rotation_result">
 Noch keine Rotation gestartet.
-    </pre>
+        </pre>
 
-</div>
+    </div>
 
     <!-- Informationen -->
-
     <div class="section">
 
         <h2>ℹ️ Team Informationen</h2>
@@ -129,9 +119,9 @@ Noch keine Rotation gestartet.
             <li>17 Mitarbeiter</li>
             <li>18 Stationen</li>
             <li>Doppeltakt auf 40/50/60/70 möglich</li>
-            <li>Fairness vorbereitet</li>
-            <li>Support Funktion vorbereitet</li>
-            <li>Skillmatrix mit Haken-System</li>
+            <li>Fairness Rotation aktiv</li>
+            <li>Support Funktion aktiv</li>
+            <li>Skillmatrix vorbereitet</li>
         </ul>
 
     </div>
