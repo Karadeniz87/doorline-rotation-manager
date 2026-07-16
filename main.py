@@ -456,51 +456,29 @@ def run_rotation(
     # ------------------------------------
     # Stationsbesetzung
     # ------------------------------------
-    for station in current_stations:
+for station in current_stations:
 
-        selected_employee = None
+    selected_employee = None
 
-        for employee in active_employees:
+    for employee in active_employees:
 
-            if employee.id in assigned_ids:
-                continue
+        if employee.id in assigned_ids:
+            continue
 
-            if "+" in station:
+        if employee.last_station == station:
+            continue
 
-                station_a, station_b = station.split("+")
+        selected_employee = employee
+        break
 
-                skill_a = f"skill_{station_a}"
-                skill_b = f"skill_{station_b}"
+    if selected_employee:
 
-                if employee.last_station == station:
-                    continue
+        assigned_ids.add(
+            selected_employee.id
+        )
 
-                if (
-                    getattr(employee, skill_a, False)
-                    and getattr(employee, skill_b, False)
-                ):
-                    selected_employee = employee
-                    break
-
-            else:
-
-                skill_name = f"skill_{station}"
-
-                if employee.last_station == station:
-                    continue
-
-                if getattr(employee, skill_name, False):
-                    selected_employee = employee
-                    break
-
-        if selected_employee:
-
-            assigned_ids.add(
-                selected_employee.id
-            )
-
-            selected_employee.station = station
-            selected_employee.last_station = station
+        selected_employee.station = station
+        selected_employee.last_station = station
 
             # -----------------------
             # Fairness Gewichtung
