@@ -53,6 +53,27 @@ async function loadStations() {
 
         for (let i = 0; i < stations.length; i += 2) {
 
+async function loadStations(){
+
+    try {
+
+        const response =
+            await fetch("/stations");
+
+        const stations =
+            await response.json();
+
+        const container =
+            document.getElementById(
+                "stations_container"
+            );
+
+        if(!container) return;
+
+        container.innerHTML = "";
+
+        for(let i=0;i<stations.length;i+=2){
+
             const left = stations[i];
 
             const right = stations[i + 1] || {
@@ -60,67 +81,64 @@ async function loadStations() {
                 employee: null
             };
 
-let statusClass = "green-status";
+            let statusClass = "green-status";
 
-/* Beide Stationen leer */
-if (
-    !left.employee &&
-    !right.employee
-){
-    statusClass = "red-status";
-}
+            if(
+                !left.employee &&
+                !right.employee
+            ){
+                statusClass = "red-status";
+            }
+            else if(
+                !left.employee ||
+                !right.employee
+            ){
+                statusClass = "yellow-status";
+            }
 
-/* Eine Seite besetzt */
-else if (
-    !left.employee ||
-    !right.employee
-){
-    statusClass = "yellow-status";
-}
+            const doubleTaktStations = [
+                "40L","40R",
+                "50L","50R",
+                "60L","60R",
+                "70L","70R"
+            ];
 
-/* Doppeltakt Stationen */
-const doubleTaktStations = [
-    "40L","40R",
-    "50L","50R",
-    "60L","60R",
-    "70L","70R"
-];
+            if(
+                doubleTaktStations.includes(
+                    left.station
+                )
+            ){
+                statusClass = "yellow-status";
+            }
 
-if(
-    doubleTaktStations.includes(
-        left.station
-    )
-){
-    statusClass = "yellow-status";
-}
+            container.innerHTML += `
+            <div class="station-row">
 
-container.innerHTML += `
-<div class="station-row">
+                <div class="station-left">
+                    <h3>${left.station}</h3>
+                    <p>
+                        👤 ${left.employee || "Nicht besetzt"}
+                    </p>
+                </div>
 
-    <div class="station-left">
-        <h3>${left.station}</h3>
-        <p>
-            👤 ${left.employee || "Nicht besetzt"}
-        </p>
-    </div>
+                <div class="production-line">
+                    <div class="
+                        status-circle
+                        ${statusClass}
+                    ">
+                    </div>
+                </div>
 
-    <div class="production-line">
-        <div class="
-            status-circle
-            ${statusClass}
-        ">
-        </div>
-    </div>
+                <div class="station-right">
+                    <h3>${right.station}</h3>
+                    <p>
+                        👤 ${right.employee || "Nicht besetzt"}
+                    </p>
+                </div>
 
-    <div class="station-right">
-        <h3>${right.station}</h3>
-        <p>
-            👤 ${right.employee || "Nicht besetzt"}
-        </p>
-    </div>
-
-</div>
-`;
+            </div>
+            `;
+        }
 
     } catch (error) {
 
@@ -130,7 +148,6 @@ container.innerHTML += `
         );
     }
 }
-
 
 async function runRotation() {
 
